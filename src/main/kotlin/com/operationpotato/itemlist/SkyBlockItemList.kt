@@ -1,5 +1,6 @@
 package com.operationpotato.itemlist
 
+import com.operationpotato.itemlist.api.impl.PluginManager
 import com.operationpotato.itemlist.gui.EntireListWidget
 import net.fabricmc.api.ClientModInitializer
 import net.fabricmc.fabric.api.client.screen.v1.ScreenEvents
@@ -33,6 +34,9 @@ object SkyBlockItemList : ClientModInitializer {
 			ScreenKeyboardEvents.allowKeyPress(screen).register { _, event ->
 				itemList.keyPressed(event)
 				return@register true
+			}
+			ScreenEvents.beforeExtract(screen).register { _, _, _, _, _ ->
+				PluginManager.refreshExclusionZones()
 			}
 		}
 	}

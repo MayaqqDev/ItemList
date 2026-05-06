@@ -1,10 +1,13 @@
 package com.operationpotato.itemlist.gui
 
+import com.operationpotato.itemlist.api.impl.PluginManager
 import net.minecraft.client.gui.components.AbstractWidget
 import net.minecraft.client.gui.layouts.GridLayout
 import net.minecraft.client.gui.layouts.Layout
 import net.minecraft.client.gui.layouts.LayoutElement
 import net.minecraft.client.gui.layouts.LayoutSettings
+import net.minecraft.client.gui.layouts.SpacerElement
+import net.minecraft.client.gui.navigation.ScreenRectangle
 import java.util.function.Consumer
 
 class PaginatedGridLayout(private var x: Int, private var y: Int) : Layout {
@@ -13,13 +16,42 @@ class PaginatedGridLayout(private var x: Int, private var y: Int) : Layout {
 
 	private val gridLayouts = mutableListOf<MarkedGridLayout>()
 
-	fun addChildren(children: List<LayoutElement>, maxCols: Int, maxRows: Int) {
+	fun calcExcludedAreas(startX: Int, startY: Int, maxCols: Int, maxRows: Int, itemSize: Int): List<Pair<Int, Int>> {
+		val screenRect = ScreenRectangle(x, y, x + maxCols * itemSize, y + maxRows * itemSize)
+		val activeExclusionZones = PluginManager.getExclusionZones().filter { zone ->
+			screenRect.overlaps(zone.area)
+		}
+		if (activeExclusionZones.isEmpty()) return listOf()
+		val excludedAreas = mutableListOf<Pair<Int, Int>>()
+		for (col in 0..maxCols) {
+			for (row in 0..maxRows) {
+				val x = startX + (col * itemSize)
+				val y = startY + (row * itemSize)
+				val rect = ScreenRectangle(x, y, itemSize, itemSize)
+				for (zone in activeExclusionZones) {
+					if (zone.area.overlaps(rect)) {
+						excludedAreas.add(Pair(col, row))
+						break
+					}
+				}
+			}
+		}
+
+		return excludedAreas
+	}
+
+	fun addChildren(children: List<LayoutElement>, maxCols: Int, maxRows: Int, itemSize: Int) {
 		var page = 0
 		var layout = MarkedGridLayout(x, y)
 		var col = 0
 		var row = 0
+		val excludedAreas = calcExcludedAreas(x, y, maxCols, maxRows, itemSize)
 		children.forEach { display ->
-			layout.addChild(display, row, col)
+			if (excludedAreas.contains(Pair(col, row))) {
+				layout.addChild(SpacerElement(itemSize, itemSize), row, col)
+			} else {
+				layout.addChild(display, row, col)
+			}
 			col += 1
 			if (col > maxCols) {
 				col = 0

@@ -1,5 +1,6 @@
 package com.operationpotato.itemlist.gui
 
+import com.operationpotato.itemlist.api.impl.PluginManager
 import com.operationpotato.itemlist.utils.ThreadUtils
 import net.minecraft.client.gui.GuiGraphicsExtractor
 import net.minecraft.client.gui.components.AbstractContainerWidget
@@ -46,17 +47,17 @@ abstract class AbstractItemList(x: Int, y: Int, width: Int, height: Int) :
 		visibleCols = Math.floorDiv(adjustedWidth, scaledSize)
 		horizontalPadding = (adjustedWidth - visibleCols * scaledSize) / 2
 		visibleRows = itemListHeight / scaledSize
-		if (visibleCols != previouslyVisibleCols || visibleRows != previouslyVisibleRows) {
-			positionDisplays(visibleCols - 1, visibleRows)
+		if (PluginManager.didExclusionZonesChange() || visibleCols != previouslyVisibleCols || visibleRows != previouslyVisibleRows) {
+			positionDisplays(visibleCols - 1, visibleRows, scaledSize)
 		}
 		layout.switchPage(currentPage - 1)
 	}
 
 	// Off-Thread
-	fun positionDisplays(maxCols: Int, maxRows: Int) {
+	fun positionDisplays(maxCols: Int, maxRows: Int, scaledSize: Int) {
 		val newLayout = PaginatedGridLayout(x + horizontalPadding, y + PADDING + McFont.height / 2)
 		getItems().forEach { it.scale(itemScale) }
-		newLayout.addChildren(getItems(), maxCols, maxRows)
+		newLayout.addChildren(getItems(), maxCols, maxRows, scaledSize)
 		layout = newLayout
 		maxPages = layout.pages
 		currentPage = currentPage.coerceIn(1, maxPages)
@@ -121,6 +122,9 @@ abstract class AbstractItemList(x: Int, y: Int, width: Int, height: Int) :
 		mouseY: Int,
 		a: Float
 	) {
+		if (PluginManager.didExclusionZonesChange()) {
+			ThreadUtils.SORTING_EXECUTOR.execute(::updatePositions)
+		}
 		graphics.centeredText(
 			McFont.self, Component.literal("${currentPage}/${maxPages}"),
 			x + width / 2, y + McFont.height, CommonColors.WHITE

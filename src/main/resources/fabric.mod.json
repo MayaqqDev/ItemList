@@ -19,6 +19,12 @@
 				"value": "com.operationpotato.itemlist.SkyBlockItemList",
 				"adapter": "kotlin"
 			}
+		],
+		"skyblock-item-list": [
+			{
+				"value": "com.operationpotato.itemlist.api.impl.DefaultPlugin",
+				"adapter": "kotlin"
+			}
 		]
 	},
 	"mixins": [
