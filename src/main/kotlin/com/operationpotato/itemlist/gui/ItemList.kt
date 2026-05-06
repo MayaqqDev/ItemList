@@ -42,11 +42,10 @@ class ItemList(x: Int, y: Int, width: Int, height: Int) :
 		val previouslyVisibleRows = visibleRows
 		val adjustedWidth = width - PADDING
 
-		val scaledWidth = (StackDisplay.STACK_WIDTH * itemScale).roundToInt()
-		val scaledHeight = (StackDisplay.STACK_WIDTH * itemScale).roundToInt()
-		visibleCols = Math.floorDiv(adjustedWidth, scaledWidth)
-		horizontalPadding = (adjustedWidth - visibleCols * scaledWidth) / 2
-		visibleRows = itemListHeight / scaledHeight
+		val scaledSize = (StackDisplay.STACK_SIZE * itemScale).roundToInt()
+		visibleCols = Math.floorDiv(adjustedWidth, scaledSize)
+		horizontalPadding = (adjustedWidth - visibleCols * scaledSize) / 2
+		visibleRows = itemListHeight / scaledSize
 		if (visibleCols != previouslyVisibleCols || visibleRows != previouslyVisibleRows) {
 			positionDisplays(visibleCols - 1, visibleRows)
 		}
@@ -138,7 +137,7 @@ class ItemList(x: Int, y: Int, width: Int, height: Int) :
 	override fun updateWidgetNarration(output: NarrationElementOutput) {}
 
 	companion object {
-		private const val PADDING = StackDisplay.STACK_HEIGHT
+		private const val PADDING = StackDisplay.STACK_SIZE
 		private val children: List<StackDisplay> by registryBoundLazy { getItems() }
 
 		fun getItems(): List<StackDisplay> {

@@ -19,7 +19,7 @@ import tech.thatgravyboat.skyblockapi.platform.translate
 import kotlin.math.roundToInt
 
 class StackDisplay(val lazyStack: LazyItemStack) :
-	AbstractWidget(0, 0, STACK_WIDTH, STACK_HEIGHT, Component.empty()) {
+	AbstractWidget(0, 0, STACK_SIZE, STACK_SIZE, Component.empty()) {
 
 	var stack: ItemStack = ItemStack.EMPTY
 	var scale: Float = 1f
@@ -58,16 +58,15 @@ class StackDisplay(val lazyStack: LazyItemStack) :
 	}
 
 	fun scale(scale: Float) {
-		setSize((STACK_WIDTH * scale).roundToInt(), (STACK_HEIGHT * scale).roundToInt())
+		val scaledSize = (STACK_SIZE * scale).roundToInt()
+		setSize(scaledSize, scaledSize)
 		this.scale = scale
 	}
 
 	override fun updateWidgetNarration(output: NarrationElementOutput) {}
 
 	companion object {
-		const val STACK_WIDTH = 16
-		const val STACK_HEIGHT = 16
-
+		const val STACK_SIZE = 16
 		const val HIGHLIGHT_SIZE = 24
 
 		private val HIGHLIGHT_BACK: Identifier = Identifier.withDefaultNamespace("container/slot_highlight_back")
