@@ -5,7 +5,6 @@ import com.operationpotato.itemlist.utils.ThreadUtils
 import net.minecraft.client.gui.GuiGraphicsExtractor
 import net.minecraft.client.gui.components.AbstractContainerWidget
 import net.minecraft.client.gui.components.events.GuiEventListener
-import net.minecraft.client.gui.layouts.GridLayout
 import net.minecraft.client.gui.narration.NarrationElementOutput
 import net.minecraft.network.chat.Component
 import net.minecraft.util.CommonColors
@@ -21,8 +20,7 @@ class ItemList(x: Int, y: Int, width: Int, height: Int) :
 	val itemListHeight: Int
 		get() = height - 3 * PADDING
 
-	var visibleChildren: List<StackDisplay> = mutableListOf()
-	var layout: GridLayout = GridLayout()
+	var layout: PaginatedGridLayout = PaginatedGridLayout(x, y)
 
 	var visibleCols: Int = 0
 	var visibleRows: Int = 0
@@ -42,37 +40,15 @@ class ItemList(x: Int, y: Int, width: Int, height: Int) :
 		if (visibleCols != previouslyVisibleCols || visibleRows != previouslyVisibleRows) {
 			positionDisplays(visibleCols, visibleRows)
 		}
-		layout.setPosition(x, y + (currentPage - 1) * visibleCols * PADDING * -1)
-		layout.arrangeElements()
-		updateVisibility()
-	}
-
-	// Off-thread
-	fun updateVisibility() {
-		val currentlyVisible: MutableList<StackDisplay> = mutableListOf()
-		children.forEach { child ->
-			child.visible = child.x in x..x + width - PADDING && child.y in y..y + height
-			if (child.visible) {
-				currentlyVisible.add(child)
-			}
-		}
-		visibleChildren = currentlyVisible
+		layout.switchPage(currentPage - 1)
 	}
 
 	// Off-Thread
 	fun positionDisplays(maxCols: Int, maxRows: Int) {
-		layout = GridLayout()
-		var col = 0
-		var row = 0
-		children.forEach { display ->
-			layout.addChild(display, row, col)
-			col += 1
-			if (col > maxCols) {
-				col = 0
-				row += 1
-			}
-		}
-		maxPages = Math.ceilDiv(row, maxRows) + 2
+		val newLayout = PaginatedGridLayout(x, y)
+		newLayout.addChildren(children, maxCols, maxRows)
+		layout = newLayout
+		maxPages = layout.pages
 		currentPage = currentPage.coerceIn(1, maxPages)
 	}
 
@@ -121,7 +97,7 @@ class ItemList(x: Int, y: Int, width: Int, height: Int) :
 			x + width / 2, McFont.height, CommonColors.WHITE
 		)
 		graphics.enableScissor(x, y, x + width, y + height)
-		visibleChildren.forEach {
+		layout.visitPageWidgets {
 			it.extractRenderState(graphics, mouseX, mouseY, a)
 		}
 		graphics.disableScissor()
