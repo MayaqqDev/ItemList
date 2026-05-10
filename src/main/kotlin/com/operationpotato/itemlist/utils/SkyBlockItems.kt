@@ -9,8 +9,26 @@ object SkyBlockItems {
 	val itemNames by registryBoundLazy { getAllItemNames() }
 	val items by registryBoundLazy { getAllItems() }
 
+	val numeralPattern = Regex("[_;]([0-9]+)$")
+
+	fun sortByNameAndNumber(a: String, b: String): Int {
+		val aMatch = numeralPattern.find(a)
+		val bMatch = numeralPattern.find(b)
+		if (aMatch != null && bMatch != null) {
+			val aStart = a.substring(0, aMatch.range.first);
+			val bStart = b.substring(0, bMatch.range.first)
+			val comparison = aStart.compareTo(bStart)
+			if (comparison == 0) {
+				val aNum = aMatch.groupValues[1].toIntOrNull() ?: return a.compareTo(b)
+				val bNum = bMatch.groupValues[1].toIntOrNull() ?: return a.compareTo(b)
+				return aNum.compareTo(bNum)
+			}
+		}
+		return a.compareTo(b)
+	}
+
 	fun getAllItemNames(): List<String> {
-		return RepoAPI.items().items().keys.sorted()
+		return RepoAPI.items().items().keys.sortedWith(::sortByNameAndNumber)
 	}
 
 	fun getAllItems(): List<LazyItemStack> {
