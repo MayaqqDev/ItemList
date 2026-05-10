@@ -1,10 +1,12 @@
 package com.operationpotato.itemlist.utils
 
 import tech.thatgravyboat.repolib.api.RepoAPI
+import tech.thatgravyboat.skyblockapi.api.data.SkyBlockRarity
 import tech.thatgravyboat.skyblockapi.api.repo.LazyItemStack
 import tech.thatgravyboat.skyblockapi.api.repo.apis.SkyBlockAttributesRepo
 import tech.thatgravyboat.skyblockapi.api.repo.apis.SkyBlockEnchantmentsRepo
 import tech.thatgravyboat.skyblockapi.api.repo.apis.SkyBlockItemsRepo
+import tech.thatgravyboat.skyblockapi.api.repo.apis.SkyBlockPetsRepo
 import tech.thatgravyboat.skyblockapi.api.repo.apis.SkyBlockRunesRepo
 import tech.thatgravyboat.skyblockapi.utils.lazy.registryBoundLazy
 
@@ -14,6 +16,7 @@ object SkyBlockItems {
 	private val attributeNames by registryBoundLazy { getAllAttributeNames() }
 	private val enchantNames by registryBoundLazy { getAllEnchantmentNames() }
 	private val itemNames by registryBoundLazy { getAllItemNames() }
+	private val petNames by registryBoundLazy { getAllPetNames() }
 	private val runeNames by registryBoundLazy { getAllRuneNames() }
 
 	private val numeralPattern = Regex("[_;]([0-9]+)$")
@@ -50,6 +53,15 @@ object SkyBlockItems {
 		return RepoAPI.items().items().keys.toList()
 	}
 
+	private fun getAllPetNames(): List<SkyBlockPetsRepo.Query> {
+		return RepoAPI.pets().pets().map { (k, v) ->
+			v.tiers.map { x ->
+				val maxLevel = 100 + x.value.variablesOffset
+				SkyBlockPetsRepo.Query(id = k, rarity = SkyBlockRarity.fromName(x.key), level = maxLevel)
+			}
+		}.flatten()
+	}
+
 	private fun getAllRuneNames(): List<SkyBlockRunesRepo.Query> {
 		return RepoAPI.runes().runes().map { (_, v) ->
 			v.map { x -> SkyBlockRunesRepo.Query(id = x.id, tier = x.tier) }
@@ -74,6 +86,11 @@ object SkyBlockItems {
 		itemNames.forEach { key ->
 			val stack = SkyBlockItemsRepo.getLazyItemStack(key) ?: return@forEach
 			allItems.add(Item(stack, SkyBlockItemCategory.ITEM, key))
+		}
+
+		petNames.forEach { key ->
+			val stack = SkyBlockPetsRepo.getLazyItemStack(key) ?: return@forEach
+			allItems.add(Item(stack, SkyBlockItemCategory.PET, "${key.id};${key.rarity.ordinal}"))
 		}
 
 		runeNames.forEach { key ->
