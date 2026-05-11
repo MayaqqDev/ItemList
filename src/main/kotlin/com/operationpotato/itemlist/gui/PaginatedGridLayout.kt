@@ -14,6 +14,11 @@ class PaginatedGridLayout(private var x: Int, private var y: Int) : Layout {
 	var activePage = 0
 	var pages = 0
 
+	var excludedAreas: List<Pair<Int, Int>> = listOf()
+	var maxCols: Int = 0
+	var maxRows: Int = 0
+	var itemSize: Int = 0
+
 	private val gridLayouts = mutableListOf<MarkedGridLayout>()
 
 	fun calcExcludedAreas(startX: Int, startY: Int, maxCols: Int, maxRows: Int, itemSize: Int): List<Pair<Int, Int>> {
@@ -41,11 +46,14 @@ class PaginatedGridLayout(private var x: Int, private var y: Int) : Layout {
 	}
 
 	fun addChildren(children: List<LayoutElement>, maxCols: Int, maxRows: Int, itemSize: Int) {
+		this.maxCols = maxCols
+		this.maxRows = maxRows
+		this.itemSize = itemSize
 		var page = 0
 		var layout = MarkedGridLayout(x, y)
 		var col = 0
 		var row = 0
-		val excludedAreas = calcExcludedAreas(x, y, maxCols, maxRows, itemSize)
+		excludedAreas = calcExcludedAreas(x, y, maxCols, maxRows, itemSize)
 		// don't bother if >50% of the screen is excluded
 		if (excludedAreas.size > (maxCols * maxRows * 0.5)) return
 		val iterator = children.iterator()
@@ -71,6 +79,15 @@ class PaginatedGridLayout(private var x: Int, private var y: Int) : Layout {
 		gridLayouts.add(layout)
 		activePage = 0
 		pages = gridLayouts.size
+	}
+
+	fun compareExcludedAreas(): Boolean {
+		val newZones = calcExcludedAreas(x, y, maxCols, maxRows, itemSize)
+		if (newZones.size != excludedAreas.size) return true
+		for (pair in newZones) {
+			if (!excludedAreas.contains(pair)) return true
+		}
+		return false
 	}
 
 	fun switchPage(page: Int) {

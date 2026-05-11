@@ -47,7 +47,9 @@ abstract class AbstractItemList(x: Int, y: Int, width: Int, height: Int) :
 		visibleCols = Math.floorDiv(adjustedWidth, scaledSize)
 		horizontalPadding = (adjustedWidth - visibleCols * scaledSize) / 2
 		visibleRows = itemListHeight / scaledSize
-		if (PluginManager.didExclusionZonesChange() || visibleCols != previouslyVisibleCols || visibleRows != previouslyVisibleRows) {
+		if ((PluginManager.didExclusionZonesChange() && layout.compareExcludedAreas()) ||
+			visibleCols != previouslyVisibleCols || visibleRows != previouslyVisibleRows
+		) {
 			positionDisplays(visibleCols - 1, visibleRows, scaledSize)
 		}
 		layout.switchPage(currentPage - 1)
