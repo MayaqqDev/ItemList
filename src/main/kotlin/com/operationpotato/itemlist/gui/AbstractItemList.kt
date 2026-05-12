@@ -106,7 +106,7 @@ abstract class AbstractItemList(width: Int, height: Int) :
 
 	fun scrollItemSize(scrollY: Double) {
 		itemScale += scrollY.toFloat() / 25
-		itemScale = itemScale.coerceIn(1f, 3f)
+		itemScale = itemScale.coerceIn(0.5f, 3f)
 		scrollAmountWidget = TemporalTextWidget(
 			x + width / 2, itemListHeight / 2, 5f,
 			Component.literal("${(itemScale * 100).toInt()}%"), McFont.self
