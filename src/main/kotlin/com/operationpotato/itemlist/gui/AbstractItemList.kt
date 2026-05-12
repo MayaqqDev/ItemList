@@ -31,10 +31,14 @@ abstract class AbstractItemList(width: Int, height: Int) :
 	var maxPages: Int = 1
 
 	init {
-		ThreadUtils.SORTING_EXECUTOR.execute(::updatePositions)
+		updatePositionsAsync()
 	}
 
 	abstract fun getItems(): List<StackDisplay>
+
+	fun updatePositionsAsync() {
+		ThreadUtils.SORTING_EXECUTOR.execute(::updatePositions)
+	}
 
 	// Off-Thread
 	fun updatePositions() {
@@ -66,7 +70,7 @@ abstract class AbstractItemList(width: Int, height: Int) :
 
 	override fun setPosition(x: Int, y: Int) {
 		super.setPosition(x, y)
-		ThreadUtils.SORTING_EXECUTOR.execute(::updatePositions)
+		updatePositionsAsync()
 	}
 
 	override fun contentHeight(): Int {
@@ -88,7 +92,7 @@ abstract class AbstractItemList(width: Int, height: Int) :
 			}
 		}
 		currentPage = currentPage.coerceIn(1, maxPages)
-		ThreadUtils.SORTING_EXECUTOR.execute(::updatePositions)
+		updatePositionsAsync()
 	}
 
 	fun scrollItemSize(scrollY: Double) {
@@ -98,7 +102,7 @@ abstract class AbstractItemList(width: Int, height: Int) :
 			x + width / 2, itemListHeight / 2, 5f,
 			Component.literal("${(itemScale * 100).toInt()}%"), McFont.self
 		)
-		ThreadUtils.SORTING_EXECUTOR.execute(::updatePositions)
+		updatePositionsAsync()
 	}
 
 	override fun mouseScrolled(
@@ -123,9 +127,7 @@ abstract class AbstractItemList(width: Int, height: Int) :
 		mouseY: Int,
 		a: Float
 	) {
-		if (PluginManager.didExclusionZonesChange()) {
-			ThreadUtils.SORTING_EXECUTOR.execute(::updatePositions)
-		}
+		if (PluginManager.didExclusionZonesChange()) updatePositionsAsync()
 		graphics.centeredText(
 			McFont.self, Component.literal("${currentPage}/${maxPages}"),
 			x + width / 2, y + McFont.height, CommonColors.WHITE
