@@ -41,9 +41,8 @@ object SkyBlockItemList : ClientModInitializer {
 			}
 			val keyPress = ScreenKeyboardEvents.allowKeyPress(screen)
 			keyPress.addPhaseOrdering(Event.DEFAULT_PHASE, latePhase)
-			keyPress.register(latePhase) { _, event ->
-				itemPanel.keyPressed(event)
-				return@register true
+			keyPress.register(latePhase) { screen, event ->
+				itemPanel.onScreenKeyPress(screen, event)
 			}
 			val beforeExtract = ScreenEvents.beforeExtract(screen)
 			beforeExtract.addPhaseOrdering(Event.DEFAULT_PHASE, latePhase)

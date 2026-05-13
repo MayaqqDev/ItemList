@@ -7,6 +7,7 @@ import tech.thatgravyboat.skyblockapi.utils.lazy.registryBoundLazy
 class EntireListWidget(width: Int, height: Int) : AbstractItemList(width, height) {
 	var visibleChildren: List<StackDisplay> = listOf()
 	var currentFilter: SkyBlockItemCategory = SkyBlockItemCategory.ALL
+	var currentSearch: String = ""
 
 	fun filterChildren(category: SkyBlockItemCategory) {
 		currentFilter = category
@@ -17,8 +18,18 @@ class EntireListWidget(width: Int, height: Int) : AbstractItemList(width, height
 		}
 	}
 
+	fun searchChildren(search: String) {
+		val lower = search.lowercase()
+		if (search.isEmpty() || !lower.startsWith(currentSearch)) {
+			filterChildren(currentFilter)
+		}
+		currentSearch = lower
+		if (lower.isEmpty()) return
+		visibleChildren = visibleChildren.filter { it.matchesSearch(search) }
+	}
+
 	override fun getItems(): List<StackDisplay> {
-		if (visibleChildren.isEmpty()) filterChildren(currentFilter)
+		if (visibleChildren.isEmpty()) searchChildren(currentSearch)
 		return visibleChildren
 	}
 

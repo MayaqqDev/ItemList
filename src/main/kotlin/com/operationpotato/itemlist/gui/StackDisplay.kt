@@ -17,6 +17,7 @@ import tech.thatgravyboat.skyblockapi.helpers.McPlayer
 import tech.thatgravyboat.skyblockapi.platform.pushPop
 import tech.thatgravyboat.skyblockapi.platform.scale
 import tech.thatgravyboat.skyblockapi.platform.translate
+import tech.thatgravyboat.skyblockapi.utils.text.TextProperties.stripped
 import kotlin.math.roundToInt
 
 class StackDisplay(val lazyStack: LazyItemStack, val type: SkyBlockItemCategory) :
@@ -62,6 +63,12 @@ class StackDisplay(val lazyStack: LazyItemStack, val type: SkyBlockItemCategory)
 		val scaledSize = (STACK_SIZE * scale).roundToInt()
 		setSize(scaledSize, scaledSize)
 		this.scale = scale
+	}
+
+	fun matchesSearch(string: String): Boolean {
+		if (stack.isEmpty) stack = lazyStack.create()
+		val search = string.lowercase()
+		return stack.hoverName.stripped.lowercase().contains(search)
 	}
 
 	override fun updateWidgetNarration(output: NarrationElementOutput) {}
