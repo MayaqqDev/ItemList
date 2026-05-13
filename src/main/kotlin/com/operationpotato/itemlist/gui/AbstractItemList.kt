@@ -10,6 +10,7 @@ import net.minecraft.network.chat.Component
 import net.minecraft.util.CommonColors
 import tech.thatgravyboat.skyblockapi.helpers.McClient
 import tech.thatgravyboat.skyblockapi.helpers.McFont
+import java.util.concurrent.Future
 import kotlin.math.roundToInt
 
 abstract class AbstractItemList(width: Int, height: Int) :
@@ -31,6 +32,8 @@ abstract class AbstractItemList(width: Int, height: Int) :
 	var currentPage: Int = 1
 	var maxPages: Int = 1
 
+	var sortingFuture: Future<*>? = null
+
 	init {
 		updatePositionsAsync()
 	}
@@ -38,7 +41,9 @@ abstract class AbstractItemList(width: Int, height: Int) :
 	abstract fun getItems(): List<StackDisplay>
 
 	fun updatePositionsAsync() {
-		ThreadUtils.SORTING_EXECUTOR.execute(::updatePositions)
+		val future = sortingFuture
+		if (future != null && !future.isDone) future.cancel(true)
+		sortingFuture = ThreadUtils.SORTING_EXECUTOR.submit(::updatePositions)
 	}
 
 	fun switchPage(page: Int) {
