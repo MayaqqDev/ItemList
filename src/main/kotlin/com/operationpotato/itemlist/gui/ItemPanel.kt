@@ -19,6 +19,7 @@ import net.minecraft.client.gui.layouts.LinearLayout
 import net.minecraft.client.gui.layouts.SpacerElement
 import net.minecraft.client.gui.narration.NarrationElementOutput
 import net.minecraft.client.gui.screens.Screen
+import net.minecraft.client.gui.screens.inventory.AbstractContainerScreen
 import net.minecraft.client.gui.screens.inventory.PageButton
 import net.minecraft.client.input.KeyEvent
 import net.minecraft.network.chat.Component
@@ -26,6 +27,8 @@ import net.minecraft.util.ARGB
 import net.minecraft.util.CommonColors
 import tech.thatgravyboat.skyblockapi.helpers.McClient
 import tech.thatgravyboat.skyblockapi.helpers.McFont
+import tech.thatgravyboat.skyblockapi.helpers.McScreen
+import tech.thatgravyboat.skyblockapi.utils.extentions.right
 import java.util.concurrent.Future
 
 class ItemPanel(x: Int, y: Int, width: Int, height: Int) :
@@ -46,15 +49,11 @@ class ItemPanel(x: Int, y: Int, width: Int, height: Int) :
 		CycleButton.builder(SkyBlockItemCategory::asComponent, SkyBlockItemCategory.ALL)
 			.withValues(SkyBlockItemCategory.entries)
 			.withTooltip(::createFilterTooltip)
-			.create(
-				x + width - AbstractItemList.PADDING - 7, y + height - 20,
-				16, 16, Component.empty(), ::onFilterButtonClick
-			)
+			.create(Component.empty(), ::onFilterButtonClick)
 	val searchBox: EditBox = EditBox(
-		McFont.self, x + 20, y + height - 20,
-		width - 44, 16,
-		Component.empty()
+		McFont.self, 0, 16, Component.empty()
 	)
+	var bottomLayout: LinearLayout = LinearLayout.horizontal()
 
 	val children: List<AbstractWidget> = listOf(nextPageButton, prevPageButton, filterButton, searchBox, itemListWidget)
 
@@ -62,10 +61,16 @@ class ItemPanel(x: Int, y: Int, width: Int, height: Int) :
 	var searchFuture: Future<*>? = null
 
 	init {
+		updatePosition()
+	}
+
+	fun updatePosition() {
 		positionTopBar()
+		positionBottomBar()
 
 		itemListWidget.x = x + AbstractItemList.PADDING
 		itemListWidget.y = y
+		itemListWidget.width = width - AbstractItemList.PADDING
 		itemListWidget.positioningCallback = {
 			McClient.runOrNextTick { positionTopBar() }
 			McClient.runOrNextTick { updateSearchResult() }
@@ -94,6 +99,18 @@ class ItemPanel(x: Int, y: Int, width: Int, height: Int) :
 		topLayout.addChild(SpacerElement.width(width - contentWidth))
 		topLayout.addChild(nextPageButton) { it.alignHorizontallyRight() }
 		topLayout.arrangeElements()
+	}
+
+	fun positionBottomBar() {
+		filterButton.setSize(16, 16)
+		searchBox.width = width - 26 - filterButton.width
+
+		bottomLayout = LinearLayout.horizontal()
+		bottomLayout.defaultCellSetting().paddingRight(4)
+		bottomLayout.setPosition(x + 20, y + height - 20)
+		bottomLayout.addChild(searchBox)
+		bottomLayout.addChild(filterButton)
+		bottomLayout.arrangeElements()
 	}
 
 	fun createFilterTooltip(category: SkyBlockItemCategory): Tooltip {
@@ -166,6 +183,14 @@ class ItemPanel(x: Int, y: Int, width: Int, height: Int) :
 			return true
 		}
 		return false
+	}
+
+	fun updateWidth() {
+		val screen = McScreen.self
+		if (screen !is AbstractContainerScreen<*>) return
+		x = screen.right
+		width = screen.width - screen.right
+		updatePosition()
 	}
 
 	// if the screen should process this key press.
