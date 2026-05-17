@@ -1,7 +1,6 @@
 package com.operationpotato.itemlist
 
 import com.operationpotato.itemlist.api.impl.PluginManager
-import com.operationpotato.itemlist.gui.EntireListWidget
 import com.operationpotato.itemlist.gui.ItemPanel
 import net.fabricmc.api.ClientModInitializer
 import net.fabricmc.fabric.api.client.screen.v1.ScreenEvents
@@ -19,8 +18,10 @@ import tech.thatgravyboat.skyblockapi.utils.extentions.right
 
 object SkyBlockItemList : ClientModInitializer {
 	val latePhase = Identifier.fromNamespaceAndPath("skyblock-item-list", "late")
+	var instance: ItemPanel? = null
 
 	override fun onInitializeClient() {
+		Keybinds.init()
 		ScreenEvents.AFTER_INIT.addPhaseOrdering(Event.DEFAULT_PHASE, latePhase)
 		ScreenEvents.AFTER_INIT.register(latePhase, ::addItemListWidget)
 	}
@@ -30,8 +31,10 @@ object SkyBlockItemList : ClientModInitializer {
 		if (screen is AbstractContainerScreen<*>) {
 			if (screen is InventoryScreen && mc.player?.hasInfiniteMaterials() ?: false) return
 			val width = w - screen.right
-			if (width < 80) return
 			val itemPanel = ItemPanel(screen.right, 0, width, h)
+			instance = itemPanel
+			itemPanel.visible = Settings.enabled
+			if (width < 80) itemPanel.visible = false
 
 			Screens.getWidgets(screen).add(itemPanel)
 			val mouseScroll = ScreenMouseEvents.allowMouseScroll(screen)
@@ -42,12 +45,23 @@ object SkyBlockItemList : ClientModInitializer {
 			val keyPress = ScreenKeyboardEvents.allowKeyPress(screen)
 			keyPress.addPhaseOrdering(Event.DEFAULT_PHASE, latePhase)
 			keyPress.register(latePhase) { screen, event ->
-				itemPanel.onScreenKeyPress(screen, event)
+				val bl = itemPanel.onScreenKeyPress(screen, event)
+				if (!bl) return@register false
+				if (Keybinds.hideOverlay.matches(event)) {
+					itemPanel.visible = !itemPanel.visible
+					return@register false
+				}
+				true
 			}
 			val beforeExtract = ScreenEvents.beforeExtract(screen)
 			beforeExtract.addPhaseOrdering(Event.DEFAULT_PHASE, latePhase)
 			beforeExtract.register(latePhase) { _, _, _, _, _ ->
 				PluginManager.refreshExclusionZones()
+			}
+			ScreenEvents.remove(screen).register {
+				Settings.enabled = itemPanel.visible
+				Settings.scale = itemPanel.getScale()
+				instance = null
 			}
 		}
 	}

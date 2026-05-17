@@ -1,5 +1,6 @@
 package com.operationpotato.itemlist.gui
 
+import com.operationpotato.itemlist.Settings
 import com.operationpotato.itemlist.utils.ComponentUtils
 import com.operationpotato.itemlist.utils.SkyBlockItemCategory
 import com.operationpotato.itemlist.utils.ThreadUtils
@@ -29,7 +30,7 @@ import java.util.concurrent.Future
 
 class ItemPanel(x: Int, y: Int, width: Int, height: Int) :
 	AbstractContainerWidget(x, y, width, height, Component.empty(), defaultSettings(0)) {
-	val itemListWidget = EntireListWidget(width - AbstractItemList.PADDING, height)
+	val itemListWidget = EntireListWidget(width - AbstractItemList.PADDING, height - 20)
 
 	val prevPageButton: Button = PageButton(0, 0, false, { _ ->
 		itemListWidget.scrollPage(false)
@@ -65,12 +66,23 @@ class ItemPanel(x: Int, y: Int, width: Int, height: Int) :
 
 		itemListWidget.x = x + AbstractItemList.PADDING
 		itemListWidget.y = y
-		itemListWidget.positioningCallback = { McClient.runOrNextTick { positionTopBar() } }
+		itemListWidget.positioningCallback = {
+			McClient.runOrNextTick { positionTopBar() }
+			McClient.runOrNextTick { updateSearchResult() }
+		}
+		itemListWidget.itemScale = Settings.scale
 		itemListWidget.updatePositionsAsync()
 
+		filterButton.value = Settings.lastFilter
 		filterButton.message = Component.literal("F")
+		searchBox.value = Settings.lastSearch
 		searchBox.setHint(Component.literal("Search..."))
 		searchBox.setResponder(::searchAsync)
+
+		if (Settings.lastFilter != SkyBlockItemCategory.ALL)
+			itemListWidget.currentFilter = filterButton.value
+		if (Settings.lastSearch.isNotEmpty())
+			itemListWidget.currentSearch = searchBox.value
 	}
 
 	fun positionTopBar() {
@@ -92,6 +104,7 @@ class ItemPanel(x: Int, y: Int, width: Int, height: Int) :
 	}
 
 	fun onFilterButtonClick(btn: CycleButton<SkyBlockItemCategory>, category: SkyBlockItemCategory) {
+		Settings.lastFilter = category
 		val color = if (category == SkyBlockItemCategory.ALL) {
 			ChatFormatting.WHITE
 		} else {
@@ -113,16 +126,24 @@ class ItemPanel(x: Int, y: Int, width: Int, height: Int) :
 	}
 
 	fun searchAsync(text: String) {
+		Settings.lastSearch = text
 		this.searchFuture = ThreadUtils.SORTING_EXECUTOR.cancelAndSubmit(searchFuture) {
 			itemListWidget.searchChildren(text)
 			itemListWidget.switchPage(0)
 			itemListWidget.updatePositionsAsync()
-			if (itemListWidget.visibleChildren.isNotEmpty()) {
-				searchBox.setTextColor(CommonColors.TEXT_GRAY)
-			} else {
-				searchBox.setTextColor(ARGB.opaque(ChatFormatting.RED.color!!))
-			}
 		}
+	}
+
+	fun updateSearchResult() {
+		if (itemListWidget.visibleChildren.isNotEmpty()) {
+			searchBox.setTextColor(CommonColors.TEXT_GRAY)
+		} else {
+			searchBox.setTextColor(ARGB.opaque(ChatFormatting.RED.color!!))
+		}
+	}
+
+	fun getScale(): Float {
+		return itemListWidget.itemScale
 	}
 
 	override fun children(): List<GuiEventListener> {
