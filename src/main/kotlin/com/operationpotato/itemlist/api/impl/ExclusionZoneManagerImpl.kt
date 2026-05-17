@@ -6,6 +6,7 @@ import com.operationpotato.itemlist.api.ExclusionZoneProvider
 import it.unimi.dsi.fastutil.objects.Object2ObjectOpenHashMap
 import net.minecraft.client.gui.screens.Screen
 import tech.thatgravyboat.skyblockapi.helpers.McScreen
+import java.util.*
 
 class ExclusionZoneManagerImpl : ExclusionZoneManager {
 	private var providers: Object2ObjectOpenHashMap<ExclusionZoneProvider<Screen?>, Class<Screen?>> = Object2ObjectOpenHashMap()
@@ -34,14 +35,23 @@ class ExclusionZoneManagerImpl : ExclusionZoneManager {
 				zones.forEach { exclusionZones.add(ExclusionZone(it)) }
 			}
 		}
+		hasChanged = previousHash != hash(exclusionZones)
+	}
+
+	fun hash(list: List<ExclusionZone>): Int {
+		var hash = 17
+		list.forEach { zone ->
+			val rect = zone.area
+			val zoneHash = Objects.hash(rect.x, rect.y, rect.width, rect.height)
+			hash = 31 * hash + zoneHash
+		}
+		return hash
 	}
 
 	fun clearExclusionZones() {
 		previous = exclusionZones
+		previousHash = hash(previous)
 		exclusionZones = mutableListOf()
-		val hash = previous.hashCode()
-		hasChanged = previousHash != hash
-		previousHash = hash
 	}
 
 	fun getHasChanged(): Boolean {

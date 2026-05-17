@@ -9,11 +9,18 @@ object PluginManager {
 		FabricLoader.getInstance().getEntrypoints("skyblock-item-list", Plugin::class.java)
 	private val exclusionZoneManager = ExclusionZoneManagerImpl()
 
-	fun refreshExclusionZones() {
-		exclusionZoneManager.calculateExclusionZones()
+	init {
+		registerPlugins()
+	}
+
+	fun registerPlugins() {
 		for (plugin in plugins) {
 			plugin.registerExclusionZones(exclusionZoneManager)
 		}
+	}
+
+	fun refreshExclusionZones() {
+		exclusionZoneManager.calculateExclusionZones()
 	}
 
 	fun getExclusionZones(): List<ExclusionZone> {
