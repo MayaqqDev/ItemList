@@ -21,7 +21,9 @@ object SkyBlockMobsRepo : RepoItemCache<String>("Mobs") {
 		val data = repo.getMob(key) ?: return null
 		val type = key.substringAfterLast("_")
 		val shouldTitleCase = !suffixesToCapitalize.any { type == it }
-		val suffix = if (shouldTitleCase) type.toTitleCase() else type
+		var suffix = if (shouldTitleCase) type.toTitleCase() else type
+		// TODO: remove this when SkyBlockAPI gives the NEU mob type directly
+		if (data.island == "rift") suffix = "Rift $suffix"
 
 		val stackName = Component.literal("${data.name} ($suffix)")
 			.style { withItalic(false) }
