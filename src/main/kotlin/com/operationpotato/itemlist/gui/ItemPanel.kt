@@ -23,7 +23,6 @@ import net.minecraft.client.gui.screens.inventory.AbstractContainerScreen
 import net.minecraft.client.gui.screens.inventory.PageButton
 import net.minecraft.client.input.KeyEvent
 import net.minecraft.network.chat.Component
-import net.minecraft.util.ARGB
 import net.minecraft.util.CommonColors
 import tech.thatgravyboat.skyblockapi.helpers.McClient
 import tech.thatgravyboat.skyblockapi.helpers.McFont
@@ -128,14 +127,12 @@ class ItemPanel(x: Int, y: Int, width: Int, height: Int) :
 		}
 		btn.message = Component.literal("F").withStyle(color)
 		filterAsync(category)
-		if (searchBox.value.isNotEmpty()) {
-			searchBox.setTextColor(CommonColors.SOFT_YELLOW)
-		}
 	}
 
 	fun filterAsync(category: SkyBlockItemCategory) {
 		this.filterFuture = ThreadUtils.SORTING_EXECUTOR.cancelAndSubmit(filterFuture) {
 			itemListWidget.filterChildren(category)
+			itemListWidget.searchChildren(Settings.lastSearch)
 			itemListWidget.switchPage(0)
 			itemListWidget.updatePositionsAsync()
 		}
@@ -151,10 +148,10 @@ class ItemPanel(x: Int, y: Int, width: Int, height: Int) :
 	}
 
 	fun updateSearchResult() {
-		if (itemListWidget.visibleChildren.isNotEmpty()) {
-			searchBox.setTextColor(CommonColors.TEXT_GRAY)
+		if (itemListWidget.visibleChildren.isEmpty()) {
+			searchBox.setTextColor(CommonColors.SOFT_RED)
 		} else {
-			searchBox.setTextColor(ARGB.opaque(ChatFormatting.RED.color!!))
+			searchBox.setTextColor(CommonColors.TEXT_GRAY)
 		}
 	}
 
