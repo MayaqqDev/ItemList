@@ -79,11 +79,6 @@ abstract class AbstractItemList(width: Int, height: Int) :
 		currentPage = if (maxPages == 0) 0 else currentPage.coerceIn(1, maxPages)
 	}
 
-	override fun setPosition(x: Int, y: Int) {
-		super.setPosition(x, y)
-		updatePositionsAsync()
-	}
-
 	override fun contentHeight(): Int {
 		return width
 	}

@@ -76,10 +76,8 @@ class ItemPanel(x: Int, y: Int, width: Int, height: Int) :
 		positionTopBar()
 		positionBottomBar()
 
-		itemListWidget.x = x + AbstractItemList.PADDING
-		itemListWidget.y = y
-		itemListWidget.width = width - AbstractItemList.PADDING
-		itemListWidget.height = height - 20
+		itemListWidget.setPosition(x + AbstractItemList.PADDING, y)
+		itemListWidget.setSize(width - AbstractItemList.PADDING, height - 20)
 		itemListWidget.positioningCallback = {
 			McClient.runOrNextTick { positionTopBar() }
 			McClient.runOrNextTick { updateSearchResult() }
