@@ -62,6 +62,7 @@ object SkyBlockItemList : ClientModInitializer {
 			val beforeExtract = ScreenEvents.beforeExtract(screen)
 			beforeExtract.addPhaseOrdering(Event.DEFAULT_PHASE, latePhase)
 			beforeExtract.register(latePhase) { _, _, _, _, _ ->
+				if (!itemPanel.visible) return@register
 				PluginManager.refreshExclusionZones()
 			}
 
