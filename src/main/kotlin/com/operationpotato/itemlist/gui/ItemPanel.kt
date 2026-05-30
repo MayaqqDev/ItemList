@@ -184,7 +184,6 @@ class ItemPanel(x: Int, y: Int, width: Int, height: Int) :
 		} else {
 			val mousePos = McClient.mouse
 			val child = itemListWidget.getChildAt(mousePos.first, mousePos.second).getOrNull()
-			if (child != null) println(child)
 			if (child !is StackDisplay) return false
 			if (PluginManager.provideHoveredItem(child.stack, event)) return true
 		}
