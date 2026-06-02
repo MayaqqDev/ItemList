@@ -81,8 +81,8 @@ class ItemPanel(x: Int, y: Int, width: Int, height: Int) :
 		positionTopBar()
 		positionBottomBar()
 
-		itemListWidget.setPosition(x + AbstractItemList.PADDING, y)
-		itemListWidget.setSize(width - AbstractItemList.PADDING, height - 20)
+		itemListWidget.setPosition(x, y)
+		itemListWidget.setSize(width - 2, height - 20)
 		itemListWidget.positioningCallback = {
 			McClient.runOrNextTick { positionTopBar() }
 			McClient.runOrNextTick { updateSearchResult() }
@@ -94,11 +94,11 @@ class ItemPanel(x: Int, y: Int, width: Int, height: Int) :
 
 	fun positionTopBar() {
 		val leftPadding = AbstractItemList.PADDING + itemListWidget.horizontalPadding
-		val contentWidth = leftPadding + itemListWidget.horizontalPadding + 2 * prevPageButton.width
+		val spacerWidth = itemListWidget.width - 2 * prevPageButton.width - leftPadding
 		topLayout = LinearLayout.horizontal()
-		topLayout.setPosition(x + leftPadding, y + 5)
+		topLayout.setPosition(itemListWidget.x + leftPadding, y + 5)
 		topLayout.addChild(prevPageButton) { it.alignHorizontallyLeft() }
-		topLayout.addChild(SpacerElement.width(width - contentWidth))
+		topLayout.addChild(SpacerElement.width(spacerWidth))
 		topLayout.addChild(nextPageButton) { it.alignHorizontallyRight() }
 		topLayout.arrangeElements()
 	}
@@ -109,7 +109,7 @@ class ItemPanel(x: Int, y: Int, width: Int, height: Int) :
 
 		bottomLayout = LinearLayout.horizontal()
 		bottomLayout.defaultCellSetting().paddingRight(4)
-		bottomLayout.setPosition(x + 20, y + height - 20)
+		bottomLayout.setPosition(x + 20 + itemListWidget.horizontalPadding, y + height - 20)
 		bottomLayout.addChild(searchBox)
 		bottomLayout.addChild(filterButton)
 		bottomLayout.arrangeElements()

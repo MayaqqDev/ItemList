@@ -53,9 +53,9 @@ abstract class AbstractItemList(width: Int, height: Int) :
 		val prevItemCount = itemCount
 		val adjustedWidth = width - PADDING
 
-		visibleCols = Math.floorDiv(adjustedWidth, itemSize)
+		visibleCols = Math.ceilDiv(adjustedWidth, itemSize)
 		horizontalPadding = (adjustedWidth - visibleCols * itemSize) / 2
-		visibleRows = itemListHeight / itemSize
+		visibleRows = Math.ceilDiv(itemListHeight, itemSize)
 		itemCount = getItems().size
 		if ((PluginManager.didExclusionZonesChange() && layout.compareExcludedAreas()) ||
 			visibleCols != previouslyVisibleCols || visibleRows != previouslyVisibleRows ||
@@ -69,7 +69,7 @@ abstract class AbstractItemList(width: Int, height: Int) :
 
 	// Off-Thread
 	fun positionDisplays(maxCols: Int, maxRows: Int, scaledSize: Int) {
-		val newLayout = PaginatedGridLayout(x + horizontalPadding, y + PADDING + McFont.height / 2)
+		val newLayout = PaginatedGridLayout(x + PADDING + horizontalPadding, y + PADDING + McFont.height / 2)
 		newLayout.addChildren(getItems(), maxCols, maxRows, scaledSize)
 		layout = newLayout
 		maxPages = layout.pages
@@ -79,7 +79,7 @@ abstract class AbstractItemList(width: Int, height: Int) :
 	fun scaleChildren() = getItems().forEach { it.scale(itemSize) }
 
 	override fun contentHeight(): Int {
-		return width
+		return height
 	}
 
 	override fun children(): List<GuiEventListener> = getItems()
@@ -143,7 +143,7 @@ abstract class AbstractItemList(width: Int, height: Int) :
 			McFont.self, Component.literal("${currentPage}/${maxPages}"),
 			x + width / 2, y + McFont.height, CommonColors.WHITE
 		)
-		graphics.enableScissor(x, y, x + width, y + height)
+		graphics.enableScissor(x, y, x + width - horizontalPadding, y + height)
 		layout.visitPageWidgets {
 			it.extractRenderState(graphics, mouseX, mouseY, a)
 		}

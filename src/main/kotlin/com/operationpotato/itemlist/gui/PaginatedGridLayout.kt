@@ -66,11 +66,11 @@ class PaginatedGridLayout(private var x: Int, private var y: Int) : Layout {
 				layout.addChild(iterator.next(), row, col)
 			}
 			col += 1
-			if (col > maxCols) {
+			if (col >= maxCols) {
 				col = 0
 				row += 1
 			}
-			if (row > maxRows) {
+			if (row >= maxRows) {
 				row = 0
 				col = 0
 				gridLayouts.add(layout)
