@@ -203,8 +203,6 @@ class ItemPanel(x: Int, y: Int, width: Int, height: Int) :
 	fun onScreenKeyPress(screen: Screen, event: KeyEvent): Boolean {
 		if (!this.visible) return true
 		if (event.isEscape) return true
-		if (!this.searchBox.isFocused) return true
-		if (screen.focused == this.searchBox) return true
 		return !keyPressed(event)
 	}
 
