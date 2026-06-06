@@ -102,7 +102,8 @@ java {
 
 tasks.register<Jar>("apiJar") {
 	description = "Assembles a jar with only API classes"
-	archiveClassifier.set("api")
+	archiveBaseName = "${rootProject.name}-api"
+	destinationDirectory = layout.buildDirectory.dir("libs/api")
 	from(sourceSets.main.get().output) {
 		include("com/operationpotato/itemlist/api/**")
 	}
@@ -110,7 +111,9 @@ tasks.register<Jar>("apiJar") {
 
 tasks.register<Jar>("apiSourcesJar") {
 	description = "Assembles a jar with only API sources"
-	archiveClassifier.set("api-sources")
+	archiveBaseName = "${rootProject.name}-api"
+	archiveClassifier.set("sources")
+	destinationDirectory = layout.buildDirectory.dir("libs/api")
 	from(sourceSets.main.get().allSource) {
 		include("com/operationpotato/itemlist/api/**")
 	}
@@ -140,6 +143,7 @@ publishing {
 				if (!isFullRelease) {
 					version += "-SNAPSHOT"
 				}
+				artifactId = "${rootProject.name}-api"
 			}
 			artifact(tasks.named("apiJar"))
 			artifact(tasks.named("apiSourcesJar"))
