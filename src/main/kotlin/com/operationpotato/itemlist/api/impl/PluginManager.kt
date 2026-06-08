@@ -4,6 +4,7 @@ import com.operationpotato.itemlist.api.ExclusionZone
 import com.operationpotato.itemlist.api.Plugin
 import net.fabricmc.loader.api.FabricLoader
 import net.minecraft.client.gui.components.AbstractWidget
+import net.minecraft.client.gui.screens.Screen
 import net.minecraft.client.input.KeyEvent
 import net.minecraft.world.item.ItemStack
 import org.jetbrains.annotations.ApiStatus
@@ -44,6 +45,10 @@ object PluginManager {
 
 	fun provideHoveredItem(stack: ItemStack, keyEvent: KeyEvent): Boolean {
 		return hoveredItemManager.provideHoveredItem(McScreen.self!!, stack, keyEvent)
+	}
+
+	fun getHoveredItem(screen: Screen): ItemStack? {
+		return hoveredItemManager.getHoveredItem(screen)
 	}
 
 	fun getRecipeButtons(recipe: Recipe<*>): List<AbstractWidget> {

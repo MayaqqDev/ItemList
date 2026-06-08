@@ -2,6 +2,7 @@ package com.operationpotato.itemlist.api.impl
 
 import com.google.common.collect.Ordering
 import com.operationpotato.itemlist.api.ExclusionZoneManager
+import com.operationpotato.itemlist.api.HoveredItemManager
 import com.operationpotato.itemlist.api.Plugin
 import com.operationpotato.itemlist.api.RecipeButtonManager
 import net.minecraft.client.gui.components.Button
@@ -17,6 +18,7 @@ import org.jetbrains.annotations.ApiStatus
 import tech.thatgravyboat.skyblockapi.helpers.McFont
 import tech.thatgravyboat.skyblockapi.helpers.McPlayer
 import tech.thatgravyboat.skyblockapi.utils.extentions.cleanName
+import tech.thatgravyboat.skyblockapi.utils.extentions.getHoveredSlot
 import tech.thatgravyboat.skyblockapi.utils.extentions.right
 import tech.thatgravyboat.skyblockapi.utils.extentions.top
 import tech.thatgravyboat.skyblockapi.utils.text.Text
@@ -40,6 +42,13 @@ class DefaultPlugin : Plugin {
 					size(10, 10)
 				}.build()
 			)
+		}
+	}
+
+	override fun registerHoveredItems(hoveredItemManager: HoveredItemManager) {
+		hoveredItemManager.addProvider { screen ->
+			if (screen is AbstractContainerScreen<*>) return@addProvider screen.getHoveredSlot()?.item
+			return@addProvider null
 		}
 	}
 

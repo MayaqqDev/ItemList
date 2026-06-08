@@ -69,7 +69,8 @@ object SkyBlockItemList : ClientModInitializer {
 					Settings.enabled = itemPanel.visible
 					return@register false
 				}
-				return@register itemPanel.onScreenKeyPress(screen, event)
+				if (!itemPanel.onScreenKeyPress(screen, event)) return@register false
+				return@register !handleScreenRecipeLookup(screen, event)
 			}
 			val beforeExtract = ScreenEvents.beforeExtract(screen)
 			beforeExtract.addPhaseOrdering(Event.DEFAULT_PHASE, latePhase)
@@ -82,6 +83,11 @@ object SkyBlockItemList : ClientModInitializer {
 				itemPanel.removed()
 			}
 		}
+	}
+
+	fun handleScreenRecipeLookup(screen: Screen, event: KeyEvent): Boolean {
+		val item = PluginManager.getHoveredItem(screen) ?: return false
+		return Keybinds.handleKeybind(item, event)
 	}
 
 	fun resetWidget() {
