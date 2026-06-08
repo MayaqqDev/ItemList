@@ -6,7 +6,7 @@ plugins {
 	alias(libs.plugins.publish)
 }
 
-version = providers.gradleProperty("mod_version").get()
+version = providers.gradleProperty("mod_version").get() + "+" + libs.versions.minecraft.get()
 group = providers.gradleProperty("maven_group").get()
 
 repositories {
