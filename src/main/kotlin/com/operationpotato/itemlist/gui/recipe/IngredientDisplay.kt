@@ -1,6 +1,7 @@
 package com.operationpotato.itemlist.gui.recipe
 
 import com.operationpotato.itemlist.Keybinds
+import com.operationpotato.itemlist.api.impl.PluginManager
 import net.minecraft.client.gui.GuiGraphicsExtractor
 import net.minecraft.client.gui.components.AbstractWidget
 import net.minecraft.client.gui.narration.NarrationElementOutput
@@ -65,7 +66,11 @@ class IngredientDisplay(val stack: ItemStack, val showStackSize: Boolean = true)
 		}
 	}
 
-	override fun keyPressed(event: KeyEvent): Boolean = Keybinds.handleKeybind(stack, event)
+	override fun keyPressed(event: KeyEvent): Boolean {
+		if (PluginManager.provideHoveredItem(stack, event)) return true
+		if (Keybinds.handleKeybind(stack, event)) return true
+		return false
+	}
 
 	override fun updateWidgetNarration(output: NarrationElementOutput) {}
 
