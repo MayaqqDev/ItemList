@@ -22,6 +22,7 @@ abstract class AbstractItemPanel(
 	}
 
 	final override fun mouseScrolled(x: Double, y: Double, scrollX: Double, scrollY: Double): Boolean {
+		if (!visible) return false
 		return getListWidget().mouseScrolled(x, y, scrollX, scrollY)
 	}
 
