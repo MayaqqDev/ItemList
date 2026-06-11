@@ -9,7 +9,8 @@ import tech.thatgravyboat.skyblockapi.api.remote.api.SkyBlockId
 data class Favorites(
 	var favoriteItems: List<SkyBlockId> = emptyList(),
 	var favoriteRecipes: List<Recipe<*>> = emptyList(),
-	var favoriteMobs: List<String> = emptyList()
+	var favoriteMobs: List<String> = emptyList(),
+	var pinnedRecipe: Recipe<*>? = null,
 ) {
 	companion object {
 		val CODEC: Codec<Favorites> = RecordCodecBuilder.create { instance ->
@@ -17,6 +18,7 @@ data class Favorites(
 				SkyBlockId.CODEC.listOf().optionalFieldOf("favoriteItems", emptyList()).forGetter(Favorites::favoriteItems),
 				RecipeCodecs.RECIPE.listOf().optionalFieldOf("favoriteRecipes", emptyList()).forGetter(Favorites::favoriteRecipes),
 				Codec.STRING.listOf().optionalFieldOf("favoriteMobs", emptyList()).forGetter(Favorites::favoriteMobs),
+				RecipeCodecs.RECIPE.optionalFieldOf("pinnedRecipe", null).forGetter(Favorites::pinnedRecipe),
 			).apply(instance, ::Favorites)
 		}
 	}

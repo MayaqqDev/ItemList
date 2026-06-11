@@ -1,6 +1,7 @@
 package com.operationpotato.itemlist.gui.favorites
 
 import com.operationpotato.itemlist.config.ConfigManager
+import com.operationpotato.itemlist.favorites.FavoritesManager
 import com.operationpotato.itemlist.gui.AbstractItemList
 import com.operationpotato.itemlist.gui.AbstractItemPanel
 import com.operationpotato.itemlist.gui.recipe.AbstractRecipeWidget
@@ -18,13 +19,17 @@ import tech.thatgravyboat.skyblockapi.utils.text.TextColor
 
 class FavoritesPanel(x: Int, y: Int, width: Int, height: Int) : AbstractItemPanel(x, y, width, height) {
 	val listWidget = FavoritesListWidget(width - AbstractItemList.PADDING, height)
-
-	var activeRecipe: Recipe<*>? = null
 	var recipeWidget: AbstractRecipeWidget? = null
+
+	init {
+		listWidget.itemSize = ConfigManager.get().favoritesItemSize
+		val pinnedRecipe = FavoritesManager.favorites.pinnedRecipe
+		if (pinnedRecipe != null) setRecipe(pinnedRecipe)
+	}
 
 	override fun updatePosition() {
 		val recipe = recipeWidget
-		if (recipe != null) {
+		if (recipe != null && width != 0) {
 			recipe.setPosition((width - recipe.width) / 2, 5)
 			if (recipe.width > width) {
 				Text.of("Your screen is too small to pin this recipe!").withColor(TextColor.RED).send()
@@ -35,7 +40,6 @@ class FavoritesPanel(x: Int, y: Int, width: Int, height: Int) : AbstractItemPane
 		val listWidgetY = recipeWidget?.bottom ?: y
 		listWidget.setPosition(x, listWidgetY)
 		listWidget.setSize(width - 2, height - listWidgetY - 20)
-		listWidget.itemSize = ConfigManager.get().favoritesItemSize
 		listWidget.scaleChildren()
 		listWidget.updatePositionsAsync()
 	}
@@ -64,13 +68,12 @@ class FavoritesPanel(x: Int, y: Int, width: Int, height: Int) : AbstractItemPane
 	}
 
 	fun setRecipe(recipe: Recipe<*>) {
-		activeRecipe = recipe
+		FavoritesManager.favorites.pinnedRecipe = recipe
 		recipeWidget = if (recipe != recipeWidget?.recipe) RecipeScreen.getWidgetForRecipe(recipe) else null
 		updatePosition()
 	}
 
 	fun removeRecipe() {
-		activeRecipe = null
 		recipeWidget = null
 		updatePosition()
 	}

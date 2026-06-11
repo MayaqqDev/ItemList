@@ -63,7 +63,7 @@ class DefaultPlugin : Plugin {
 		}
 
 		manager.addProvider { recipeObj, _ ->
-			if (recipeObj != SkyBlockItemList.favoriteInstance?.activeRecipe) return@addProvider Optional.empty()
+			if (recipeObj != FavoritesManager.favorites.pinnedRecipe) return@addProvider Optional.empty()
 			Optional.of(
 				Button.builder(Text.of("x")) {
 					SkyBlockItemList.favoriteInstance?.removeRecipe()

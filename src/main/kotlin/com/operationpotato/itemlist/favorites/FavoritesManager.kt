@@ -11,7 +11,7 @@ import java.nio.file.Files
 object FavoritesManager {
 	private val file = McClient.config.resolve("skyblock-item-list", "favorites.json")
 
-	var favorites = Favorites(emptyList(), emptyList())
+	var favorites = Favorites()
 
 	fun load() {
 		if (!Files.exists(file)) return
