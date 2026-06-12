@@ -62,6 +62,7 @@ object RecipeCodecs {
 
 	val SHOP: MapCodec<ShopRecipe> = RecordCodecBuilder.mapCodec { instance ->
 		instance.group(
+			Codec.STRING.fieldOf("npc").forGetter(ShopRecipe::npc),
 			IngredientCodecs.CRAFTING_INGREDIENT.listOf().fieldOf("inputs").forGetter(ShopRecipe::inputs),
 			IngredientCodecs.CRAFTING_INGREDIENT.fieldOf("result").forGetter(ShopRecipe::result)
 		).apply(instance, ::ShopRecipe)
