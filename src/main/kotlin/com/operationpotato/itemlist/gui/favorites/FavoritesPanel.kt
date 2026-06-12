@@ -74,6 +74,7 @@ class FavoritesPanel(x: Int, y: Int, width: Int, height: Int) : AbstractItemPane
 	}
 
 	fun removeRecipe() {
+		FavoritesManager.favorites.pinnedRecipe = null
 		recipeWidget = null
 		updatePosition()
 	}
