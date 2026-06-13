@@ -36,7 +36,7 @@ object RepoLibUtils {
 			is PetIngredient -> SkyBlockId.pet(this.id(), this.tier())
 			is EnchantmentIngredient -> SkyBlockId.enchantment(this.id(), this.level())
 			is AttributeIngredient -> SkyBlockId.attribute(this.id())
-			is PotionIngredient -> SkyBlockId.potion(this.id(), this.level())
+			is PotionIngredient -> SkyBlockId.potion(this.id().removePrefix("POTION_"), this.level())
 			else -> null
 		}
 	}
