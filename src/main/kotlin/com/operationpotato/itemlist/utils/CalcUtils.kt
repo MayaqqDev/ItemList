@@ -1,7 +1,6 @@
 package com.operationpotato.itemlist.utils
 
 import com.notkamui.keval.Keval
-import com.notkamui.keval.KevalNumbers
 import com.operationpotato.itemlist.config.ConfigManager
 import tech.thatgravyboat.skyblockapi.api.profile.currency.CurrencyAPI
 import tech.thatgravyboat.skyblockapi.api.remote.hypixel.itemdata.ItemData
@@ -28,7 +27,7 @@ object CalcUtils {
 	private val resolverRegex = Regex("\\b([a-zA-Z_]+)\\(([^)]+)\\)")
 
 	val calc
-		get() = Keval.create(KevalNumbers.real) {
+		get() = Keval.create {
 			includeDefault()
 
 			fun caseInsensitiveConstant(name: String, amount: () -> Double) {
