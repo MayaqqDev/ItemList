@@ -9,6 +9,7 @@
 		"j10a1n15"
 	],
 	"contact": {
+		"homepage": "https://modrinth.com/mod/skyblock-item-list",
 		"sources": "https://github.com/OperationPotato/ItemList",
 		"issues": "https://github.com/OperationPotato/ItemList/issues"
 	},
