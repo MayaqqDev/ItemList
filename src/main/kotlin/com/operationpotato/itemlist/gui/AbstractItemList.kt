@@ -145,6 +145,11 @@ abstract class AbstractItemList(width: Int, height: Int) :
 		return true
 	}
 
+	override fun isMouseOver(mouseX: Double, mouseY: Double): Boolean {
+		if (!super.isMouseOver(mouseX, mouseY)) return false
+		return getChildAt(mouseX, mouseY).isPresent
+	}
+
 	override fun getChildAt(mouseX: Double, mouseY: Double): Optional<GuiEventListener> {
 		val widgets = layout.getPageWidgets()
 		val expanded = widgets.find { it is CollapsibleStackDisplay && it.isExpanded && it.isMouseOver(mouseX, mouseY) }
