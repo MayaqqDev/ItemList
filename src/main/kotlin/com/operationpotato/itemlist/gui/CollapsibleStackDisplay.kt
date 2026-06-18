@@ -123,6 +123,11 @@ class CollapsibleStackDisplay(
 
 		extractStack(graphics, stack, x, y, overParent)
 		graphics.pushPop {
+			graphics.translate(x, y)
+			graphics.scale(scale, scale)
+			graphics.text(McFont.self, "^", 10, 12, CommonColors.SOFT_YELLOW)
+		}
+		graphics.pushPop {
 			graphics.fill(
 				popoutX.toInt() - 2,
 				popoutY.toInt() - 2,
