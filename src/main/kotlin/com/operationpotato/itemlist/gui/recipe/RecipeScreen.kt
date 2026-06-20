@@ -1,16 +1,19 @@
 package com.operationpotato.itemlist.gui.recipe
 
 import com.operationpotato.itemlist.Keybinds
-import com.operationpotato.itemlist.favorites.FavoritesManager
 import com.operationpotato.itemlist.SkyBlockItemList.logger
 import com.operationpotato.itemlist.api.impl.PluginManager
+import com.operationpotato.itemlist.favorites.FavoritesManager
+import com.operationpotato.itemlist.gui.SpacerTextWidget
 import com.operationpotato.itemlist.utils.SkyBlockRecipeAPI
+import net.minecraft.client.Minecraft
 import net.minecraft.client.gui.components.AbstractContainerWidget
-import net.minecraft.client.gui.components.ScrollableLayout
+import net.minecraft.client.gui.components.AbstractWidget.playButtonClickSound
+import net.minecraft.client.gui.components.Button
 import net.minecraft.client.gui.layouts.FrameLayout
-import net.minecraft.client.gui.layouts.Layout
 import net.minecraft.client.gui.layouts.LinearLayout
 import net.minecraft.client.gui.screens.Screen
+import net.minecraft.client.gui.screens.inventory.PageButton
 import net.minecraft.client.input.KeyEvent
 import net.minecraft.client.input.MouseButtonEvent
 import net.minecraft.world.item.ItemStack
@@ -29,15 +32,54 @@ import tech.thatgravyboat.skyblockapi.utils.text.TextColor
 import tech.thatgravyboat.skyblockapi.utils.text.TextStyle.color
 import kotlin.jvm.optionals.getOrNull
 
-class RecipeScreen(val parent: Screen?, val recipes: List<AbstractRecipeWidget>) : Screen(Text.of("Recipe Screen")) {
-	var isOversized = false
+class RecipeScreen(val parent: Screen?, val recipes: List<AbstractRecipeWidget>, val pageIndex: Int = 0) : Screen(Text.of("Recipe Screen")) {
+
+	var pageAmount: Int = 0
+
+	val prevPageButton: Button = PageButton(0, 0, false, { _ ->
+		goBackward()
+		playButtonClickSound(Minecraft.getInstance().soundManager)
+	}, false)
+	val nextPageButton: Button = PageButton(0, 0, true, { _ ->
+		goForward()
+		playButtonClickSound(Minecraft.getInstance().soundManager)
+	}, false)
+	var topLayout: LinearLayout = LinearLayout.horizontal()
 
 	override fun init() {
 		super.init()
 
-		var layout: Layout = LinearLayout.vertical().spacing(10).apply { recipes.forEach { addChild(it) } }
-		isOversized = recipes.sumOf { it.height + 10 } > height
-		if (isOversized) layout = ScrollableLayout(McClient.self, layout, height)
+		val pages = mutableListOf(mutableListOf<AbstractRecipeWidget>())
+		val allowedSize = this@RecipeScreen.height / 5 * 4
+
+		recipes.forEach { recipe ->
+			if (pages.last().sumOf { it.height + 5 } + recipe.height > allowedSize) {
+				pages.add(mutableListOf(recipe))
+			} else {
+				pages.last().add(recipe)
+			}
+		}
+
+		pageAmount = pages.size - 1
+		val pageIndex = pageIndex.coerceIn(0, pageAmount)
+
+		topLayout = LinearLayout.horizontal()
+		val layout = LinearLayout.vertical().spacing(5).apply {
+			topLayout.addChild(prevPageButton) { it.alignHorizontallyLeft() }
+			topLayout.addChild(SpacerTextWidget(
+				0,
+				0,
+				pages[pageIndex].maxBy { it.width }.width - 46,
+				Text.of("${pageIndex + 1} / ${pages.size}"),
+				font
+			))
+			topLayout.addChild(nextPageButton) { it.alignHorizontallyRight() }
+			topLayout.arrangeElements()
+			addChild(topLayout)
+
+			pages[pageIndex].forEach(::addChild)
+		}
+
 		layout.apply {
 			arrangeElements()
 			FrameLayout.centerInRectangle(this, this@RecipeScreen.rectangle)
@@ -59,7 +101,6 @@ class RecipeScreen(val parent: Screen?, val recipes: List<AbstractRecipeWidget>)
 		recipes.forEach {
 			if (it.right > right) right = it.right
 		}
-		if (isOversized) right += 10
 		return right
 	}
 
@@ -95,6 +136,23 @@ class RecipeScreen(val parent: Screen?, val recipes: List<AbstractRecipeWidget>)
 			if (Keybinds.handleKeybind(stack, event)) return true
 		}
 		return super.keyPressed(event)
+	}
+
+	override fun mouseScrolled(x: Double, y: Double, scrollX: Double, scrollY: Double): Boolean {
+		if (super.mouseScrolled(x, y, scrollX, scrollY)) return true
+		if (x >= topLayout.x && x <= topLayout.x + topLayout.width) {
+			if (scrollY < 0) goForward() else goBackward()
+			return true
+		}
+		return false
+	}
+
+	fun goForward() {
+		McClient.setScreen(RecipeScreen(parent, recipes, if (pageIndex != pageAmount) pageIndex + 1 else 0))
+	}
+
+	fun goBackward() {
+		McClient.setScreen(RecipeScreen(parent, recipes, if (pageIndex != 0) pageIndex - 1 else pageAmount))
 	}
 
 	companion object {
