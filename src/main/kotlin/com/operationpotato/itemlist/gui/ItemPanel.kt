@@ -146,12 +146,12 @@ class ItemPanel(x: Int, y: Int, width: Int, height: Int) : AbstractItemPanel(x, 
 
 	fun onFilterButtonClick(btn: CycleButton<SkyBlockItemCategory>, category: SkyBlockItemCategory) {
 		ConfigManager.get().mainList.lastFilter = category
-		val color = if (category == SkyBlockItemCategory.ALL) {
-			ChatFormatting.WHITE
-		} else {
-			ChatFormatting.GREEN
+		val color = when (category) {
+			SkyBlockItemCategory.ALL -> CommonColors.WHITE
+			SkyBlockItemCategory.CUSTOM -> CommonColors.SOFT_YELLOW
+			else -> CommonColors.GREEN
 		}
-		btn.message = Component.literal("F").withStyle(color)
+		btn.message = Component.literal("F").withColor(color)
 		filterAsync(category)
 	}
 
