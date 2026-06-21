@@ -6,8 +6,13 @@ plugins {
 	alias(libs.plugins.publish)
 }
 
-version = providers.gradleProperty("mod_version").get() + "+" + libs.versions.minecraft.get()
+val versionedLibs = the<VersionCatalogsExtension>().find("versionedLibs${sc.current.project.replace(".", "")}").get()
+fun VersionCatalog.library(name: String): Provider<MinimalExternalModuleDependency> = this.findLibrary(name).get()
+fun VersionCatalog.version(name: String): VersionConstraint = this.findVersion(name).get()
+
+version = providers.gradleProperty("mod_version").get() + "+" + sc.current.version
 group = providers.gradleProperty("maven_group").get()
+base.archivesName = rootProject.name
 
 repositories {
 	exclusiveContent {
@@ -54,27 +59,27 @@ repositories {
 }
 
 dependencies {
-	minecraft(libs.minecraft)
+	minecraft(versionedLibs.library("minecraft"))
 
 	implementation(libs.fabric.loader)
 	implementation(libs.fabric.language.kotlin)
 
-	implementation(libs.fabric.api)
-	api(libs.skyblock.api) {
+	implementation(versionedLibs.library("fabric.api"))
+	api(versionedLibs.library("skyblock.api")) {
 		capabilities {
-			requireCapability("tech.thatgravyboat:skyblock-api-26.1")
+			requireCapability("tech.thatgravyboat:skyblock-api-${sc.current.project}")
 		}
 	}
-	include(libs.skyblock.api) {
+	include(versionedLibs.library("skyblock.api")) {
 		capabilities {
-			requireCapability("tech.thatgravyboat:skyblock-api-26.1")
+			requireCapability("tech.thatgravyboat:skyblock-api-${sc.current.project}")
 		}
 	}
 
 	includeImplementation(libs.keval)
-	includeImplementation(libs.lattice)
+	includeImplementation(versionedLibs.library("lattice"))
 
-	compileOnly(libs.modmenu)
+	compileOnly(versionedLibs.library("modmenu"))
 }
 
 fun DependencyHandlerScope.includeImplementation(dependencyNotation: Provider<*>) {
@@ -87,17 +92,22 @@ loom {
 		ideConfigGenerated(true)
 	}
 
-	accessWidenerPath = file("src/main/resources/skyblock-item-list.classtweaker")
+	accessWidenerPath = sc.process(
+		rootProject.file("src/main/resources/skyblock-item-list.classtweaker"),
+		"build/skyblock-item-list.classtweaker"
+	)
 }
 
 tasks.processResources {
 	inputs.property("version", project.property("version"))
-	inputs.property("sbapi", libs.skyblock.api.get().version)
+	inputs.property("sbapi", versionedLibs.version("skyblock.api"))
+	inputs.property("minecraft", versionedLibs.version("mcRange"))
 
 	filesMatching("fabric.mod.json") {
 		val props = mapOf(
 			"version" to inputs.properties["version"],
 			"sbapi" to inputs.properties["sbapi"],
+			"minecraft" to inputs.properties["minecraft"],
 		)
 		expand(props)
 	}
@@ -141,6 +151,23 @@ tasks.register<Jar>("apiSourcesJar") {
 
 tasks.named("assemble") {
 	dependsOn("apiJar", "apiSourcesJar")
+	doLast {
+		val files = listOf("${base.archivesName.get()}-$version.jar", "api/${base.archivesName.get()}-api-$version.jar")
+		for (fileName in files) {
+			val sourceFile = project.projectDir.resolve("build/libs/${fileName}")
+			val targetFile = rootProject.projectDir.resolve("build/libs/${fileName}")
+			targetFile.parentFile.mkdirs()
+			targetFile.writeBytes(sourceFile.readBytes())
+		}
+	}
+}
+
+tasks.named("clean") {
+	doLast {
+		val libsFolder = rootProject.projectDir.resolve("build/libs")
+		if (!libsFolder.exists()) return@doLast
+		delete(libsFolder)
+	}
 }
 
 publishing {

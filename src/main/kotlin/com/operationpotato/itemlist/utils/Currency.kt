@@ -51,7 +51,8 @@ sealed class Currency(
 
 	data object BingoPoint : Currency(Text.of("Bingo Point", TextColor.GREEN), "") {
 		override val stack: ItemStack by registryBoundLazy {
-			Items.WHITE_DYE.defaultInstance.apply {
+			//~ if <26.2 'DYE.white().' -> 'WHITE_DYE.'
+			Items.DYE.white().defaultInstance.apply {
 				set(DataComponents.CUSTOM_NAME, this@BingoPoint.itemName.apply { italic = false })
 			}
 		}
