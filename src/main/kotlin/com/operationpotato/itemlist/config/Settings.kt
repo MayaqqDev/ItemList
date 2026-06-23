@@ -64,6 +64,14 @@ class Settings {
 		var itemSize: Int = StackDisplay.STACK_SIZE
 
 		@LatticeOption(
+			title = "Center Search Bar",
+			description = "Whether the search bar should be centered horizontally on screen"
+				+ " or centered within the item panel."
+		)
+		@LatticeWidgetButton
+		var centeredSearchBar: Boolean = false
+
+		@LatticeOption(
 			title = "Hide Items Without Search",
 			description = "Hides items when there is no active search.\nThis is recommended to improve performance."
 		)

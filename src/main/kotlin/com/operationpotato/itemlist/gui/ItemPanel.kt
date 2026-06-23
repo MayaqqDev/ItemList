@@ -28,6 +28,8 @@ import net.minecraft.util.CommonColors
 import tech.thatgravyboat.skyblockapi.helpers.McClient
 import tech.thatgravyboat.skyblockapi.helpers.McFont
 import tech.thatgravyboat.skyblockapi.helpers.McScreen
+import tech.thatgravyboat.skyblockapi.utils.extentions.containerWidth
+import tech.thatgravyboat.skyblockapi.utils.extentions.left
 import tech.thatgravyboat.skyblockapi.utils.extentions.right
 import tech.thatgravyboat.skyblockapi.utils.text.Text
 import tech.thatgravyboat.skyblockapi.utils.text.TextColor
@@ -103,7 +105,8 @@ class ItemPanel(x: Int, y: Int, width: Int, height: Int) : AbstractItemPanel(x, 
 		positionBottomBar()
 
 		itemListWidget.setPosition(x, y)
-		itemListWidget.setSize(width - 2, height - 20)
+		val itemListHeight = if (ConfigManager.get().mainList.centeredSearchBar) height else height - 20
+		itemListWidget.setSize(width - 2, itemListHeight)
 		itemListWidget.positioningCallback = {
 			McClient.runOrNextTick { positionTopBar() }
 			McClient.runOrNextTick { updateSearchResult() }
@@ -126,13 +129,26 @@ class ItemPanel(x: Int, y: Int, width: Int, height: Int) : AbstractItemPanel(x, 
 
 	fun positionBottomBar() {
 		filterButton.setSize(16, 16)
-		searchBox.width = width - 10 - filterButton.width * 3
+		var searchWidth = width - 16
+		var layoutX = x + 15 + itemListWidget.horizontalPadding
+		if (ConfigManager.get().mainList.centeredSearchBar) {
+			val screen = McScreen.self
+			if (screen is AbstractContainerScreen<*>) {
+				searchWidth = screen.containerWidth
+				layoutX = screen.left
+			} else {
+				searchWidth /= 4
+				layoutX = (this.width - width) / 2
+			}
+		}
+
+		searchBox.width = searchWidth - (filterButton.width + 4) * 2
 		if (searchBox.width > McFont.width(searchHint)) searchBox.setHint(searchHint)
 		else searchBox.setHint(Component.literal("Search..."))
 
 		bottomLayout = LinearLayout.horizontal()
 		bottomLayout.defaultCellSetting().paddingRight(4)
-		bottomLayout.setPosition(x + 15 + itemListWidget.horizontalPadding, y + height - 20)
+		bottomLayout.setPosition(layoutX, y + height - 20)
 		bottomLayout.addChild(searchBox)
 		bottomLayout.addChild(filterButton)
 		bottomLayout.addChild(settingsButton)
@@ -216,6 +232,11 @@ class ItemPanel(x: Int, y: Int, width: Int, height: Int) : AbstractItemPanel(x, 
 			itemListWidget.currentFilter = filterButton.value
 		}
 		return text
+	}
+
+	override fun isMouseOver(mouseX: Double, mouseY: Double): Boolean {
+		if (!this.isActive) return false
+		return children().any { it.isMouseOver(mouseX, mouseY) }
 	}
 
 	override fun removed() {
