@@ -31,8 +31,11 @@ class FavoritesPanel(x: Int, y: Int, width: Int, height: Int) : AbstractItemPane
 	override fun updatePosition() {
 		val recipe = recipeWidget
 		if (recipe != null && width != 0) {
-			recipe.setPosition(x + (width - recipe.width) / 2, 5)
-			if (recipe.width > width) {
+			if (width > recipe.width) {
+				recipe.setPosition(x + (width - recipe.width) / 2, 5)
+			} else if (width > 3 * recipe.width / 4) {
+				recipe.setPosition(x + (width - recipe.width) + 4, 5)
+			} else {
 				Text.of("Your screen is too small to pin this recipe!").withColor(TextColor.RED).send()
 				removeRecipe()
 				return
