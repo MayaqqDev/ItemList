@@ -97,13 +97,9 @@ class RecipeScreen(val parent: Screen?, val recipes: List<AbstractRecipeWidget>,
 
 	override fun isInGameUi() = true
 
-	fun getRight(): Int {
-		var right = 0
-		recipes.forEach {
-			if (it.right > right) right = it.right
-		}
-		return right
-	}
+	fun getLeft(): Int = recipes.minOf { it.x }
+	fun getRight(): Int = recipes.maxOf { it.right }
+	fun getMaxWidth(): Int = recipes.maxOf { it.width }
 
 	override fun mouseClicked(event: MouseButtonEvent, doubleClick: Boolean): Boolean {
 		if (Keybinds.previousRecipe.matchesMouse(event)) {

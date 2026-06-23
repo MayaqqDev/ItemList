@@ -3,6 +3,7 @@ package com.operationpotato.itemlist.gui
 import com.operationpotato.itemlist.SkyBlockItemList
 import com.operationpotato.itemlist.config.ConfigManager
 import com.operationpotato.itemlist.config.ConfigScreen
+import com.operationpotato.itemlist.gui.recipe.RecipeScreen
 import com.operationpotato.itemlist.utils.CalcUtils
 import com.operationpotato.itemlist.utils.CalcUtils.isExpression
 import com.operationpotato.itemlist.utils.ComponentUtils
@@ -132,13 +133,20 @@ class ItemPanel(x: Int, y: Int, width: Int, height: Int) : AbstractItemPanel(x, 
 		var searchWidth = width - 16
 		var layoutX = x + 15 + itemListWidget.horizontalPadding
 		if (ConfigManager.get().mainList.centeredSearchBar) {
-			val screen = McScreen.self
-			if (screen is AbstractContainerScreen<*>) {
-				searchWidth = screen.containerWidth
-				layoutX = screen.left
-			} else {
-				searchWidth /= 4
-				layoutX = (this.width - width) / 2
+			when (val screen = McScreen.self) {
+				null -> {}
+				is AbstractContainerScreen<*> -> {
+					searchWidth = screen.containerWidth
+					layoutX = screen.left
+				}
+				is RecipeScreen -> {
+					searchWidth = screen.getMaxWidth()
+					layoutX = screen.getLeft()
+				}
+				else -> {
+					searchWidth = screen.width / 4
+					layoutX = (screen.width - searchWidth) / 2
+				}
 			}
 		}
 
