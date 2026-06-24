@@ -1,0 +1,56 @@
+package com.operationpotato.itemlist.gui
+
+import com.operationpotato.itemlist.utils.ComponentUtils
+import com.operationpotato.itemlist.utils.SkyBlockItemCategory
+import net.minecraft.ChatFormatting
+import net.minecraft.client.Minecraft
+import net.minecraft.client.gui.components.CycleButton
+import net.minecraft.client.gui.components.Tooltip
+import net.minecraft.client.input.MouseButtonEvent
+import net.minecraft.network.chat.Component
+import net.minecraft.util.CommonColors
+import java.util.function.Consumer
+
+class FilterButton(default: SkyBlockItemCategory, val consumer: Consumer<SkyBlockItemCategory>) :
+	CycleButton<SkyBlockItemCategory>(
+		0, 0, 16, 16,
+		Component.empty(), Component.empty(),
+		0,
+		default,
+		{ default },
+		ValueSupplier(),
+		SkyBlockItemCategory::asComponent,
+		{ btn -> btn.value.asComponent() },
+		::onValueChanged,
+		::createFilterTooltip,
+		DisplayState.VALUE,
+		{ _, _ -> null },
+	) {
+
+
+	override fun shouldTakeFocusAfterInteraction(): Boolean = false
+
+	companion object {
+		fun onValueChanged(btn: CycleButton<SkyBlockItemCategory>, category: SkyBlockItemCategory) {
+			val color = when (category) {
+				SkyBlockItemCategory.ALL -> CommonColors.WHITE
+				SkyBlockItemCategory.CUSTOM -> CommonColors.SOFT_YELLOW
+				else -> CommonColors.GREEN
+			}
+			btn.message = Component.literal("F").withColor(color)
+			if (btn is FilterButton) btn.consumer.accept(category)
+		}
+
+		fun createFilterTooltip(category: SkyBlockItemCategory): Tooltip {
+			val options = ComponentUtils.getCycleEnumOptions(category)
+			var line = Component.empty().append(category.asComponent().withStyle(ChatFormatting.GREEN))
+			line = line.append(ComponentUtils.joinComponents(options))
+			return Tooltip.create(line, null)
+		}
+	}
+
+	class ValueSupplier : ValueListSupplier<SkyBlockItemCategory> {
+		override fun getSelectedList(): List<SkyBlockItemCategory> = SkyBlockItemCategory.entries
+		override fun getDefaultList(): List<SkyBlockItemCategory> = SkyBlockItemCategory.entries
+	}
+}

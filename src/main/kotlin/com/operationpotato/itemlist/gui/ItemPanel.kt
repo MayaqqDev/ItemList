@@ -6,18 +6,15 @@ import com.operationpotato.itemlist.config.ConfigScreen
 import com.operationpotato.itemlist.gui.recipe.RecipeScreen
 import com.operationpotato.itemlist.utils.CalcUtils
 import com.operationpotato.itemlist.utils.CalcUtils.isExpression
-import com.operationpotato.itemlist.utils.ComponentUtils
 import com.operationpotato.itemlist.utils.SearchUtils
 import com.operationpotato.itemlist.utils.SkyBlockItemCategory
 import com.operationpotato.itemlist.utils.ThreadUtils
 import com.operationpotato.itemlist.utils.ThreadUtils.cancelAndSubmit
-import net.minecraft.ChatFormatting
 import net.minecraft.client.Minecraft
 import net.minecraft.client.gui.GuiGraphicsExtractor
 import net.minecraft.client.gui.components.AbstractWidget
 import net.minecraft.client.gui.components.Button
 import net.minecraft.client.gui.components.CycleButton
-import net.minecraft.client.gui.components.Tooltip
 import net.minecraft.client.gui.components.events.GuiEventListener
 import net.minecraft.client.gui.layouts.LinearLayout
 import net.minecraft.client.gui.layouts.SpacerElement
@@ -56,11 +53,7 @@ class ItemPanel(x: Int, y: Int, width: Int, height: Int) : AbstractItemPanel(x, 
 	}.apply {
 		size(16, 16)
 	}.build()
-	val filterButton: CycleButton<SkyBlockItemCategory> =
-		CycleButton.builder(SkyBlockItemCategory::asComponent, SkyBlockItemCategory.ALL)
-			.withValues(SkyBlockItemCategory.entries)
-			.withTooltip(::createFilterTooltip)
-			.create(Component.empty(), ::onFilterButtonClick)
+	val filterButton: CycleButton<SkyBlockItemCategory> = FilterButton(SkyBlockItemCategory.ALL, ::onFilterSelected)
 	val searchBox = ClearableEditBox(
 		McFont.self, 100, 16, Component.empty() // Giving it default width fixes it not starting with the input
 	)
@@ -139,10 +132,12 @@ class ItemPanel(x: Int, y: Int, width: Int, height: Int) : AbstractItemPanel(x, 
 					searchWidth = screen.containerWidth
 					layoutX = screen.left
 				}
+
 				is RecipeScreen -> {
 					searchWidth = screen.getMaxWidth()
 					layoutX = screen.getLeft()
 				}
+
 				else -> {
 					searchWidth = screen.width / 4
 					layoutX = (screen.width - searchWidth) / 2
@@ -163,21 +158,8 @@ class ItemPanel(x: Int, y: Int, width: Int, height: Int) : AbstractItemPanel(x, 
 		bottomLayout.arrangeElements()
 	}
 
-	fun createFilterTooltip(category: SkyBlockItemCategory): Tooltip {
-		val options = ComponentUtils.getCycleEnumOptions(category)
-		var line = Component.empty().append(category.asComponent().withStyle(ChatFormatting.GREEN))
-		line = line.append(ComponentUtils.joinComponents(options))
-		return Tooltip.create(line, null)
-	}
-
-	fun onFilterButtonClick(btn: CycleButton<SkyBlockItemCategory>, category: SkyBlockItemCategory) {
+	fun onFilterSelected(category: SkyBlockItemCategory) {
 		ConfigManager.get().mainList.lastFilter = category
-		val color = when (category) {
-			SkyBlockItemCategory.ALL -> CommonColors.WHITE
-			SkyBlockItemCategory.CUSTOM -> CommonColors.SOFT_YELLOW
-			else -> CommonColors.GREEN
-		}
-		btn.message = Component.literal("F").withColor(color)
 		filterAsync(category)
 	}
 
