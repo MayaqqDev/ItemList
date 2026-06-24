@@ -35,6 +35,7 @@ import kotlin.jvm.optionals.getOrNull
 class RecipeScreen(val parent: Screen?, val recipes: List<AbstractRecipeWidget>, val pageIndex: Int = 0) :
 	Screen(Text.of("Recipe Screen")) {
 
+	var visibleRecipes: List<AbstractRecipeWidget> = listOf()
 	var pageAmount: Int = 0
 
 	val prevPageButton: Button = PageButton(0, 0, false, { _ ->
@@ -63,6 +64,7 @@ class RecipeScreen(val parent: Screen?, val recipes: List<AbstractRecipeWidget>,
 
 		pageAmount = pages.size - 1
 		val pageIndex = pageIndex.coerceIn(0, pageAmount)
+		visibleRecipes = pages[pageIndex]
 
 		topLayout = LinearLayout.horizontal()
 		val layout = LinearLayout.vertical().spacing(5).apply {
@@ -70,7 +72,7 @@ class RecipeScreen(val parent: Screen?, val recipes: List<AbstractRecipeWidget>,
 			topLayout.addChild(prevPageButton) { it.alignHorizontallyLeft() }
 			//@formatter:off
 			topLayout.addChild(SpacerTextWidget(
-				pages[pageIndex].maxBy { it.width }.width - 46,
+				getMaxWidth() - 46,
 				Text.of("${pageIndex + 1} / ${pages.size}"),
 				font
 			))
@@ -81,7 +83,7 @@ class RecipeScreen(val parent: Screen?, val recipes: List<AbstractRecipeWidget>,
 		}
 
 		layout.apply {
-			pages[pageIndex].forEach(::addChild)
+			visibleRecipes.forEach(::addChild)
 			arrangeElements()
 			FrameLayout.centerInRectangle(this, this@RecipeScreen.rectangle)
 		}.visitWidgets(this::addRenderableWidget)
@@ -97,9 +99,9 @@ class RecipeScreen(val parent: Screen?, val recipes: List<AbstractRecipeWidget>,
 
 	override fun isInGameUi() = true
 
-	fun getLeft(): Int = recipes.minOf { it.x }
-	fun getRight(): Int = recipes.maxOf { it.right }
-	fun getMaxWidth(): Int = recipes.maxOf { it.width }
+	fun getLeft(): Int = visibleRecipes.minOf { it.x }
+	fun getRight(): Int = visibleRecipes.maxOf { it.right }
+	fun getMaxWidth(): Int = visibleRecipes.maxOf { it.width }
 
 	override fun mouseClicked(event: MouseButtonEvent, doubleClick: Boolean): Boolean {
 		if (Keybinds.previousRecipe.matchesMouse(event)) {
