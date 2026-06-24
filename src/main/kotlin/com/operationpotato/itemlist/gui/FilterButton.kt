@@ -30,6 +30,21 @@ class FilterButton(default: SkyBlockItemCategory, val consumer: Consumer<SkyBloc
 
 	override fun shouldTakeFocusAfterInteraction(): Boolean = false
 
+	override fun mouseClicked(event: MouseButtonEvent, doubleClick: Boolean): Boolean {
+		if (!isActive || !isMouseOver(event.x, event.y)) return false
+		if (event.button() == 0) onClick(event, doubleClick)
+		else if (event.button() == 1) {
+			value = when (value) {
+				SkyBlockItemCategory.ALL -> SkyBlockItemCategory.CUSTOM
+				SkyBlockItemCategory.CUSTOM -> SkyBlockItemCategory.ALL
+				else -> SkyBlockItemCategory.ALL
+			}
+			onValueChanged(this, value)
+		}
+		this.playDownSound(Minecraft.getInstance().soundManager)
+		return true
+	}
+
 	companion object {
 		fun onValueChanged(btn: CycleButton<SkyBlockItemCategory>, category: SkyBlockItemCategory) {
 			val color = when (category) {
