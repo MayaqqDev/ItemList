@@ -13,7 +13,7 @@ object SearchUtils {
 	fun isDistinctSearch(a: String, b: String): Boolean {
 		val aFilter = transformSearch(a)
 		val bFilter = transformSearch(b)
-		if (bFilter.size > aFilter.size) return true
+		if (bFilter.size != aFilter.size) return true
 		aFilter.forEachIndexed { index, aSearch ->
 			val bSearch = bFilter[index]
 			if (!bSearch.startsWith(aSearch)) return true
