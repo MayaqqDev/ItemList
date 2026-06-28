@@ -43,7 +43,7 @@ object SkyBlockItemList : ClientModInitializer {
 		Keybinds.init()
 		ScreenEvents.AFTER_INIT.addPhaseOrdering(Event.DEFAULT_PHASE, latePhase)
 		ScreenEvents.AFTER_INIT.register(latePhase, ::addItemListWidget)
-		ClientPlayConnectionEvents.JOIN.register { _, _, _ -> resetWidget() }
+		ClientPlayConnectionEvents.DISCONNECT.register { _, _ -> resetWidget() }
 		ClientLifecycleEvents.CLIENT_STOPPING.register {
 			ConfigManager.save()
 			FavoritesManager.save()
