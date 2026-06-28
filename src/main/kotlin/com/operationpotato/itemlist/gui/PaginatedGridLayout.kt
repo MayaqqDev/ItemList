@@ -1,5 +1,6 @@
 package com.operationpotato.itemlist.gui
 
+import com.operationpotato.itemlist.SkyBlockItemList.logger
 import com.operationpotato.itemlist.api.impl.PluginManager
 import com.operationpotato.itemlist.utils.Utils.overlaps
 import net.minecraft.client.gui.components.AbstractWidget
@@ -56,7 +57,7 @@ class PaginatedGridLayout(private var x: Int, private var y: Int) : Layout {
 		var col = 0
 		var row = 0
 		excludedAreas = calcExcludedAreas(x, y, maxCols, maxRows, itemSize)
-		val maxArea = (maxCols + 1) * (maxRows + 1)
+		val maxArea = maxCols * maxRows
 		if (maxArea - excludedAreas.size <= 0) return
 		val iterator = children.iterator()
 		while (iterator.hasNext()) {
@@ -76,6 +77,11 @@ class PaginatedGridLayout(private var x: Int, private var y: Int) : Layout {
 				gridLayouts.add(layout)
 				layout = MarkedGridLayout(x, y)
 				page += 1
+				if (page > children.size) {
+					gridLayouts.clear()
+					logger.error("[SkyBlock Item List] Something went terribly wrong trying to position items! n=${children.size} s=$maxCols*$maxRows, x=${excludedAreas.size}")
+					break
+				}
 			}
 		}
 		gridLayouts.add(layout)
