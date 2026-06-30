@@ -40,7 +40,7 @@ object SkyBlockMobsRepo : RepoItemCache<String>("Mobs") {
 		}
 		val lore = createLore(data)
 
-		val item = Identifier.parse(data.itemId().lowercase())
+		val item = Identifier.tryParse(data.itemId().lowercase())
 			?.let(BuiltInRegistries.ITEM::getValue)
 			?.takeUnless { it == Items.AIR }
 			?: Items.BARRIER
