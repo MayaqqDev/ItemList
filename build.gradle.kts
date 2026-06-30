@@ -77,7 +77,7 @@ dependencies {
 	}
 
 	includeImplementation(libs.keval)
-	includeImplementation(versionedLibs.library("lattice"))
+	includeImplementation(libs.lattice)
 
 	compileOnly(versionedLibs.library("modmenu"))
 }
