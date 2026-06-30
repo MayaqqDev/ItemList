@@ -1,8 +1,6 @@
 package com.operationpotato.itemlist.gui
 
 import com.operationpotato.itemlist.config.ConfigManager
-import com.operationpotato.itemlist.config.Settings
-import com.operationpotato.itemlist.gui.recipe.RecipeScreen
 import com.operationpotato.itemlist.utils.ScaledItemRenderer
 import com.operationpotato.itemlist.utils.SkyBlockItemCategory
 import net.minecraft.client.gui.GuiGraphicsExtractor
@@ -21,7 +19,6 @@ import tech.thatgravyboat.skyblockapi.helpers.McClient
 import tech.thatgravyboat.skyblockapi.helpers.McFont
 import tech.thatgravyboat.skyblockapi.helpers.McLevel
 import tech.thatgravyboat.skyblockapi.helpers.McPlayer
-import tech.thatgravyboat.skyblockapi.helpers.McScreen
 import tech.thatgravyboat.skyblockapi.platform.pushPop
 import tech.thatgravyboat.skyblockapi.platform.scale
 import tech.thatgravyboat.skyblockapi.platform.translate

@@ -31,7 +31,7 @@ import java.util.*
 
 // Taken with Permission from Meowdding-Lib and modified a bit ~J10a1n15
 // https://github.com/meowdding/meowdding-lib/blob/master/src/main/kotlin/me/owdding/lib/displays/item/ItemStateRenderer.kt
-class ScaledItemRenderer(/*? if <26.2 {*//*buffer: MultiBufferSource.BufferSource*//*? }*/) :
+class ScaledItemRenderer /*? if <26.2 {*//*(buffer: MultiBufferSource.BufferSource)*//*? }*/ :
 	PictureInPictureRenderer<ScaledItemRenderer.State>(/*? if <26.2 {*//*buffer*//*? }*/) {
 
 	private var textureView: GpuTextureView? = null

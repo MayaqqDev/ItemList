@@ -2,7 +2,6 @@ package com.operationpotato.itemlist.gui.favorites
 
 import com.operationpotato.itemlist.SkyBlockItemList
 import com.operationpotato.itemlist.gui.StackDisplay
-import com.operationpotato.itemlist.gui.recipe.RecipeScreen
 import com.operationpotato.itemlist.utils.SkyBlockItemCategory
 import net.minecraft.client.gui.GuiGraphicsExtractor
 import net.minecraft.client.input.MouseButtonEvent
@@ -12,7 +11,6 @@ import net.minecraft.resources.Identifier
 import net.minecraft.world.item.ItemStack
 import tech.thatgravyboat.repolib.api.recipes.Recipe
 import tech.thatgravyboat.skyblockapi.api.repo.LazyItemStack
-import tech.thatgravyboat.skyblockapi.helpers.McScreen
 import tech.thatgravyboat.skyblockapi.utils.text.Text
 import tech.thatgravyboat.skyblockapi.utils.text.TextColor
 import tech.thatgravyboat.skyblockapi.utils.text.TextStyle.italic

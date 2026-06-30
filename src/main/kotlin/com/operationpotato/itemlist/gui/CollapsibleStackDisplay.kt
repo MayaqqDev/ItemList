@@ -1,7 +1,6 @@
 package com.operationpotato.itemlist.gui
 
 import com.operationpotato.itemlist.config.ConfigManager
-import com.operationpotato.itemlist.gui.recipe.RecipeScreen
 import com.operationpotato.itemlist.utils.SkyBlockItems
 import net.minecraft.client.gui.GuiGraphicsExtractor
 import net.minecraft.client.input.MouseButtonEvent
