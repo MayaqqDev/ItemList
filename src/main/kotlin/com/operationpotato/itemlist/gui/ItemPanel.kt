@@ -1,5 +1,6 @@
 package com.operationpotato.itemlist.gui
 
+import com.operationpotato.itemlist.ContainerSearcher
 import com.operationpotato.itemlist.SkyBlockItemList
 import com.operationpotato.itemlist.config.ConfigManager
 import com.operationpotato.itemlist.config.ConfigScreen
@@ -82,6 +83,8 @@ class ItemPanel(x: Int, y: Int, width: Int, height: Int) : AbstractItemPanel(x, 
 			updateListVisibility(text, isExpression)
 			if (isExpression) calculateAsync(text)
 			else searchAsync(text)
+
+			if (ContainerSearcher.shouldSearch()) ContainerSearcher.setSearch(text)
 		}
 		searchBox.setMaxLength(999)
 		searchBox.value = ConfigManager.get().mainList.lastSearch
@@ -229,7 +232,12 @@ class ItemPanel(x: Int, y: Int, width: Int, height: Int) : AbstractItemPanel(x, 
 		return children().any { it.isMouseOver(mouseX, mouseY) }
 	}
 
+	fun added() {
+		if (ContainerSearcher.shouldSearch()) ContainerSearcher.setSearch(searchBox.value)
+	}
+
 	override fun removed() {
+		ContainerSearcher.setSearch(null)
 		ConfigManager.get().mainList.itemSize = itemListWidget.itemSize
 	}
 
