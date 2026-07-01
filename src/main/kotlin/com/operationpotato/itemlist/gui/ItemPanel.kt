@@ -15,6 +15,7 @@ import net.minecraft.client.gui.GuiGraphicsExtractor
 import net.minecraft.client.gui.components.AbstractWidget
 import net.minecraft.client.gui.components.Button
 import net.minecraft.client.gui.components.CycleButton
+import net.minecraft.client.gui.components.Tooltip
 import net.minecraft.client.gui.components.events.GuiEventListener
 import net.minecraft.client.gui.layouts.LinearLayout
 import net.minecraft.client.gui.layouts.SpacerElement
@@ -46,20 +47,23 @@ class ItemPanel(x: Int, y: Int, width: Int, height: Int) : AbstractItemPanel(x, 
 	}, false)
 	var topLayout: LinearLayout = LinearLayout.horizontal()
 
-	val settingsButton: Button = Button.builder(Component.literal("⚙")) {
+	val settingsButton: Button = SettingsButton(0, 0) {
 		SkyBlockItemList.instance?.removed()
 		SkyBlockItemList.favoriteInstance?.removed()
 		McClient.setScreen(ConfigScreen.createScreen(McScreen.self))
 	}.apply {
-		size(16, 16)
-	}.build()
+		setTooltip(Tooltip.create(Text.of("Settings")))
+		setSize(16, 16)
+	}
 	val filterButton: CycleButton<SkyBlockItemCategory> = FilterButton(SkyBlockItemCategory.ALL, ::onFilterSelected)
-	val searchBox = ClearableEditBox(
-		McFont.self, 100, 16, Component.empty() // Giving it default width fixes it not starting with the input
+	val searchBox = FilterableEditBox(
+		McFont.self, 100, 16,
+		Component.empty(), // Giving it default width fixes it not starting with the input
+		filterButton
 	)
 	var bottomLayout: LinearLayout = LinearLayout.horizontal()
 
-	val children: List<AbstractWidget> = listOf(nextPageButton, prevPageButton, filterButton, searchBox, settingsButton, itemListWidget)
+	val children: List<AbstractWidget> = listOf(nextPageButton, prevPageButton, searchBox, settingsButton, itemListWidget)
 	val searchHint = Component.literal("Search or Calculate...")
 
 	var filterFuture: Future<*>? = null
@@ -145,7 +149,7 @@ class ItemPanel(x: Int, y: Int, width: Int, height: Int) : AbstractItemPanel(x, 
 			}
 		}
 
-		searchBox.width = searchWidth - (filterButton.width + 4) * 2
+		searchBox.width = searchWidth - (filterButton.width + 4) * 1
 		if (searchBox.width > McFont.width(searchHint)) searchBox.setHint(searchHint)
 		else searchBox.setHint(Component.literal("Search..."))
 
@@ -153,9 +157,10 @@ class ItemPanel(x: Int, y: Int, width: Int, height: Int) : AbstractItemPanel(x, 
 		bottomLayout.defaultCellSetting().paddingRight(4)
 		bottomLayout.setPosition(layoutX, y + height - 20)
 		bottomLayout.addChild(searchBox)
-		bottomLayout.addChild(filterButton)
+		//bottomLayout.addChild(filterButton)
 		bottomLayout.addChild(settingsButton)
 		bottomLayout.arrangeElements()
+		filterButton.setPosition(searchBox.x + searchBox.width - 17, searchBox.y)
 	}
 
 	fun onFilterSelected(category: SkyBlockItemCategory) {

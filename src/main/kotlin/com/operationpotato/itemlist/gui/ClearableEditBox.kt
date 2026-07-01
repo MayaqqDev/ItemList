@@ -5,7 +5,7 @@ import net.minecraft.client.gui.components.EditBox
 import net.minecraft.client.input.MouseButtonEvent
 import net.minecraft.network.chat.Component
 
-class ClearableEditBox(font: Font, width: Int, height: Int, narration: Component) :
+open class ClearableEditBox(font: Font, width: Int, height: Int, narration: Component) :
 	EditBox(font, width, height, narration) {
 
 	override fun mouseClicked(event: MouseButtonEvent, doubleClick: Boolean): Boolean {
