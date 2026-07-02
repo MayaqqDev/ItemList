@@ -148,15 +148,13 @@ class ItemPanel(x: Int, y: Int, width: Int, height: Int) : AbstractItemPanel(x, 
 			}
 		}
 
-		searchBox.width = searchWidth - (filterButton.width + 4) * 1
+		searchBox.width = searchWidth - settingsButton.width
 		if (searchBox.width > McFont.width(searchHint)) searchBox.setHint(searchHint)
 		else searchBox.setHint(Component.literal("Search..."))
 
 		bottomLayout = LinearLayout.horizontal()
-		bottomLayout.defaultCellSetting().paddingRight(4)
 		bottomLayout.setPosition(layoutX, y + height - 20)
 		bottomLayout.addChild(searchBox)
-		//bottomLayout.addChild(filterButton)
 		bottomLayout.addChild(settingsButton)
 		bottomLayout.arrangeElements()
 		filterButton.setPosition(searchBox.x + searchBox.width - 17, searchBox.y)
