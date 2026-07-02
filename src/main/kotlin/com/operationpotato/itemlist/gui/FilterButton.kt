@@ -12,6 +12,7 @@ import net.minecraft.client.input.MouseButtonEvent
 import net.minecraft.client.renderer.RenderPipelines
 import net.minecraft.network.chat.Component
 import net.minecraft.resources.Identifier
+import net.minecraft.util.ARGB
 import net.minecraft.util.CommonColors
 import tech.thatgravyboat.skyblockapi.utils.text.TextStyle.color
 import java.util.function.Consumer
@@ -43,10 +44,8 @@ class FilterButton(default: SkyBlockItemCategory, val consumer: Consumer<SkyBloc
 			y,
 			width,
 			height,
-			if(message.style.color == null) {
-				0xFFFFFFFFu.toInt()
-			} else (255 shl 24) or (message.color and 0x00ffffffu.toInt()))
-
+			if (message.style.color == null) CommonColors.WHITE else ARGB.opaque(message.color)
+		)
 	}
 
 	override fun mouseClicked(event: MouseButtonEvent, doubleClick: Boolean): Boolean {
