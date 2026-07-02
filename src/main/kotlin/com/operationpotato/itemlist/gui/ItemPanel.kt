@@ -56,8 +56,8 @@ class ItemPanel(x: Int, y: Int, width: Int, height: Int) : AbstractItemPanel(x, 
 	}
 	val filterButton = FilterButton(SkyBlockItemCategory.ALL, ::onFilterSelected)
 	val searchBox = FilterableEditBox(
-		McFont.self, 100, 16,
-		Component.empty(), // Giving it default width fixes it not starting with the input
+		McFont.self, 100, 16, // Giving it default width fixes it not starting with the input
+		Component.empty(),
 		filterButton
 	)
 	var bottomLayout: LinearLayout = LinearLayout.horizontal()
