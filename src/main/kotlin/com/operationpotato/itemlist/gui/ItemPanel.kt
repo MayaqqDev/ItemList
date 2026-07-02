@@ -14,7 +14,6 @@ import net.minecraft.client.Minecraft
 import net.minecraft.client.gui.GuiGraphicsExtractor
 import net.minecraft.client.gui.components.AbstractWidget
 import net.minecraft.client.gui.components.Button
-import net.minecraft.client.gui.components.CycleButton
 import net.minecraft.client.gui.components.Tooltip
 import net.minecraft.client.gui.components.events.GuiEventListener
 import net.minecraft.client.gui.layouts.LinearLayout
@@ -55,7 +54,7 @@ class ItemPanel(x: Int, y: Int, width: Int, height: Int) : AbstractItemPanel(x, 
 		setTooltip(Tooltip.create(Text.of("Settings")))
 		setSize(16, 16)
 	}
-	val filterButton: CycleButton<SkyBlockItemCategory> = FilterButton(SkyBlockItemCategory.ALL, ::onFilterSelected)
+	val filterButton = FilterButton(SkyBlockItemCategory.ALL, ::onFilterSelected)
 	val searchBox = FilterableEditBox(
 		McFont.self, 100, 16,
 		Component.empty(), // Giving it default width fixes it not starting with the input
