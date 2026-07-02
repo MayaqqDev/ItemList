@@ -20,8 +20,20 @@ public class EditBoxMixin {
 			target = "Lnet/minecraft/client/gui/components/WidgetSprites;get(ZZ)Lnet/minecraft/resources/Identifier;"
 		)
 	)
-	public Identifier extractWidgetRenderState(WidgetSprites instance, boolean enabled, boolean focused, Operation<Identifier> original) {
+	public Identifier skyblockItemList$replaceSprites(WidgetSprites instance, boolean enabled, boolean focused, Operation<Identifier> original) {
 		return original.call(instance, enabled, focused);
+	}
+
+	@WrapOperation(
+		method = "extractWidgetRenderState",
+		at = @At(
+			value = "INVOKE",
+			target = "Ljava/lang/Math;min(II)I",
+			ordinal = 0
+		)
+	)
+	public int skyblockItemList$fixHighlightWidth(int a, int b, Operation<Integer> original) {
+		return original.call(a, b);
 	}
 
 	@Mixin(ClearableEditBox.class)
@@ -32,12 +44,19 @@ public class EditBoxMixin {
 		@Shadow
 		private boolean isSearchingInventory;
 
-		public Identifier extractWidgetRenderState(WidgetSprites instance, boolean enabled, boolean focused, Operation<Identifier> original) {
+		@Override
+		public Identifier skyblockItemList$replaceSprites(WidgetSprites instance, boolean enabled, boolean focused, Operation<Identifier> original) {
 			if (isSearchingInventory) {
 				return original.call(getSprites(), enabled, focused);
 			} else {
 				return original.call(instance, enabled, focused);
 			}
+		}
+
+		@Override
+		public int skyblockItemList$fixHighlightWidth(int a, int b, Operation<Integer> original) {
+			var instance = (ClearableEditBox) (Object) this;
+			return original.call(a, instance.getX() + instance.getInnerWidth());
 		}
 	}
 }
