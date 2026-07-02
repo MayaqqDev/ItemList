@@ -1,7 +1,6 @@
 package com.operationpotato.itemlist.gui
 
 import com.operationpotato.itemlist.SkyBlockItemList
-import com.operationpotato.itemlist.gui.SettingsButton.Companion.COG
 import com.operationpotato.itemlist.utils.ComponentUtils
 import com.operationpotato.itemlist.utils.SkyBlockItemCategory
 import net.minecraft.ChatFormatting
