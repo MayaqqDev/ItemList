@@ -9,6 +9,7 @@ import com.operationpotato.itemlist.gui.favorites.FavoritesPanel
 import com.operationpotato.itemlist.gui.recipe.RecipeScreen
 import com.operationpotato.itemlist.utils.ScaledItemRenderer
 import net.fabricmc.api.ClientModInitializer
+import net.fabricmc.fabric.api.client.command.v2.ClientCommandRegistrationCallback
 import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientLifecycleEvents
 import net.fabricmc.fabric.api.client.networking.v1.ClientPlayConnectionEvents
 import net.fabricmc.fabric.api.client.rendering.v1.PictureInPictureRendererRegistry
@@ -48,6 +49,7 @@ object SkyBlockItemList : ClientModInitializer {
 			ConfigManager.save()
 			FavoritesManager.save()
 		}
+		if (McClient.isDev) ClientCommandRegistrationCallback.EVENT.register(DebugCommands::register)
 
 		PictureInPictureRendererRegistry.register { ScaledItemRenderer(/*? if <26.2 {*//*it.bufferSource() *//*? }*/) }
 	}
