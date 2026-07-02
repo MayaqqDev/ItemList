@@ -8,7 +8,7 @@ import net.minecraft.client.gui.components.WidgetSprites
 import net.minecraft.client.input.MouseButtonEvent
 import net.minecraft.network.chat.Component
 
-class ClearableEditBox(font: Font, width: Int, height: Int, narration: Component) :
+open class ClearableEditBox(font: Font, width: Int, height: Int, narration: Component) :
 	EditBox(font, width, height, narration) {
 
 	var isSearchingInventory: Boolean = false
